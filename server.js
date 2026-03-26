@@ -26,7 +26,7 @@ try { require('fs').readFileSync('.env').toString().split('\n').forEach(line => 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'changeme123';
+const ADMIN_PASSWORD = 'Welkom200!';
 
 // Base location: 3141AP Maassluis
 const BASE_LAT = 51.9183;
@@ -87,9 +87,9 @@ function isPast(dateStr) {
 // Admin auth middleware
 // ─────────────────────────────────────────────
 function adminAuth(req, res, next) {
-  const token = req.headers['x-admin-token'] || req.query.token;
-  if (token === ADMIN_TOKEN) return next();
-  res.status(401).json({ error: 'Onbevoegd. Stuur X-Admin-Token header mee.' });
+  const pw = req.headers['x-admin-password'] || req.query.password;
+  if (pw === ADMIN_PASSWORD) return next();
+  res.status(401).json({ error: 'Onbevoegd. Verkeerd wachtwoord.' });
 }
 
 // ─────────────────────────────────────────────
@@ -477,5 +477,5 @@ async function sendConfirmationEmail(booking) {
 app.listen(PORT, () => {
   console.log(`✓ Server actief op http://localhost:${PORT}`);
   console.log(`✓ Admin panel: http://localhost:${PORT}/admin`);
-  console.log(`✓ Admin token: ${ADMIN_TOKEN === 'changeme123' ? '⚠ STANDAARD TOKEN - verander ADMIN_TOKEN in .env!' : '(ingesteld)'}`);
+  console.log(`✓ Admin wachtwoord: ingesteld`);;
 });

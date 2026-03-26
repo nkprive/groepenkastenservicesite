@@ -6,7 +6,7 @@
  */
 
 const ADMIN_API = '/api/admin';
-let adminToken = '';
+let adminToken = ''; // bevat het wachtwoord na inloggen
 let currentPage = 'dashboard';
 let availYear, availMonth;
 let allContent = {};
@@ -21,7 +21,7 @@ function adminLogin() {
 
   // Verify token by making a quick API call
   fetch(`${ADMIN_API}/bookings?month=${getCurrentMonthStr()}`, {
-    headers: { 'X-Admin-Token': token }
+    headers: { 'X-Admin-Password': token }
   }).then(r => {
     if (r.ok) {
       adminToken = token;
@@ -361,7 +361,7 @@ async function updateBookingStatus(id, status) {
 function exportCSV() {
   const month = document.getElementById('filter-month').value;
   const url = `/api/admin/export${month ? `?month=${month}` : ''}`;
-  window.location.href = url + (url.includes('?') ? '&' : '?') + `token=${adminToken}`;
+  window.location.href = url + (url.includes('?') ? '&' : '?') + `password=${adminToken}`;
 }
 
 // ─────────────────────────────────────────────
@@ -456,7 +456,7 @@ async function adminFetch(url, options = {}) {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      'X-Admin-Token': adminToken,
+      'X-Admin-Password': adminToken,
       ...(options.headers || {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
