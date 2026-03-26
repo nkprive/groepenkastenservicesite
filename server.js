@@ -17,6 +17,16 @@ const cors = require('cors');
 const fs = require('fs').promises;
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const multer = require('multer');
+
+const upload = multer({
+  dest: path.join(__dirname, 'uploads'),
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Alleen afbeeldingen toegestaan'));
+  },
+});
 
 // Load .env if present
 try { require('fs').readFileSync('.env').toString().split('\n').forEach(line => {
@@ -42,6 +52,7 @@ app.use(express.json());
 // ─────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ─────────────────────────────────────────────
 // Helpers
@@ -170,7 +181,7 @@ app.post('/api/distance', (req, res) => {
  */
 app.post('/api/bookings', async (req, res) => {
   try {
-    const { date, slot, customer, services, total, distance_km, surcharge_eur, notes } = req.body;
+    const { date, slot, customer, services, total, distance_km, surcharge_eur, notes, photo_id } = req.body;
 
     // Validation
     if (!date || !slot || !customer?.name || !customer?.email || !customer?.phone) {
@@ -213,6 +224,7 @@ app.post('/api/bookings', async (req, res) => {
       distance_km: Number(distance_km) || 0,
       surcharge_eur: Number(surcharge_eur) || 0,
       notes: String(notes || '').slice(0, 500),
+      photo_id: photo_id ? String(photo_id).replace(/[^a-z0-9\-]/gi, '') : null,
       status: 'confirmed',
       created_at: new Date().toISOString(),
     };
@@ -228,7 +240,7 @@ app.post('/api/bookings', async (req, res) => {
     res.status(201).json({
       success: true,
       booking_id: booking.id,
-      message: `Uw afspraak is bevestigd voor ${formatDate(date)}, ${slot === 'am' ? '09:00–13:00' : '13:00–17:00'}.`,
+      message: `Aanvraag ontvangen voor ${formatDate(date)}, ${slot === 'am' ? '09:00–13:00' : '13:00–17:00'}. U ontvangt spoedig een bevestiging per e-mail.`,
     });
   } catch (e) {
     console.error(e);
@@ -247,6 +259,20 @@ app.get('/api/content', async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: 'Serverfout' });
   }
+});
+
+/**
+ * POST /api/upload
+ * Upload een foto van de groepenkast (multipart/form-data, field: "photo")
+ */
+app.post('/api/upload', upload.single('photo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Geen afbeelding ontvangen' });
+  res.json({
+    photo_id: req.file.filename,
+    original_name: req.file.originalname,
+    size_kb: Math.round(req.file.size / 1024),
+    url: `/uploads/${req.file.filename}`,
+  });
 });
 
 // ─────────────────────────────────────────────
@@ -457,7 +483,7 @@ async function sendConfirmationEmail(booking) {
     from: process.env.EMAIL_FROM || 'noreply@groepenkastenservice.nl',
     to: booking.customer.email,
     subject: `Bevestiging afspraak ${formatDate(booking.date)}`,
-    text: `Beste ${booking.customer.name},\n\nUw afspraak is bevestigd!\n\nDatum: ${formatDate(booking.date)}\nTijdslot: ${slotLabel}\nAdres: ${booking.customer.address}\n\nGeselecteerde werkzaamheden:\n${servicesText}\n\nTotaal: €${booking.total_eur}${booking.surcharge_eur > 0 ? ` (incl. €${booking.surcharge_eur} reistoeslag)` : ''}\n\nVragen? Bel of mail gerust.\n\nMet vriendelijke groet,\nGroepenkastenservice Maassluis\n${process.env.COMPANY_PHONE || ''}`,
+    text: `Beste ${booking.customer.name},\n\nUw aanvraag is ontvangen!\n\nDatum: ${formatDate(booking.date)}\nTijdslot: ${slotLabel}\nAdres: ${booking.customer.address}\n\nGeselecteerde werkzaamheden:\n${servicesText}\n\nTotaal: €${booking.total_eur}${booking.surcharge_eur > 0 ? ` (incl. €${booking.surcharge_eur} reistoeslag)` : ''}\n\nU ontvangt een definitieve bevestiging zodra de afspraak is ingepland.\n\nMet vriendelijke groet,\nGroepenkastenservice Maassluis`,
   });
 
   // Notification to owner
