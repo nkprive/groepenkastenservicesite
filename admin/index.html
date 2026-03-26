@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Groepenkastenservice Maassluis</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1B4F8A; --blue-light: #e8f0fa;
+      --amber: #E8821A;
+      --green: #16a34a; --green-light: #dcfce7;
+      --red: #dc2626; --red-light: #fee2e2;
+      --gray-50: #f8fafc; --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0; --gray-400: #94a3b8;
+      --gray-600: #475569; --gray-800: #1e293b;
+      --white: #fff;
+      --radius: 8px;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--gray-50); color: var(--gray-800); min-height: 100vh; }
+    a { color: var(--blue); }
+    .hidden { display: none !important; }
+
+    /* Login screen */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.12);
+    }
+    .login-card h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    .login-card p { color: var(--gray-600); font-size: .9rem; margin-bottom: 24px; }
+    .login-card label { display: block; font-size: .85rem; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+    .login-card input {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid var(--gray-200); border-radius: var(--radius);
+      font-size: .95rem; font-family: var(--font);
+      margin-bottom: 16px; transition: border-color .15s;
+    }
+    .login-card input:focus { outline: none; border-color: var(--blue); }
+    #login-error { color: var(--red); font-size: .85rem; margin-bottom: 12px; display: none; }
+
+    /* Admin layout */
+    .admin-layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 230px;
+      background: var(--blue);
+      color: var(--white);
+      flex-shrink: 0;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+    .sidebar-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .sidebar-brand span { opacity: .6; font-size: .8rem; display: block; font-weight: 400; }
+    .sidebar-nav { padding: 12px 0; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      color: rgba(255,255,255,.8);
+      cursor: pointer;
+      font-size: .92rem;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: all .15s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.12); color: var(--white); }
+    .nav-item.active { background: rgba(255,255,255,.2); color: var(--white); }
+    .nav-item .icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-logout {
+      position: absolute;
+      bottom: 0;
+      width: 230px;
+      border-top: 1px solid rgba(255,255,255,.15);
+    }
+
+    .main-content { flex: 1; padding: 32px; min-width: 0; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 700; }
+    .page-header p { color: var(--gray-600); font-size: .9rem; margin-top: 4px; }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .card-header h2 { font-size: 1rem; font-weight: 700; }
+    .card-body { padding: 20px; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .stat-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--gray-400); font-weight: 700; margin-bottom: 8px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--blue); }
+    .stat-sub { font-size: .8rem; color: var(--gray-600); margin-top: 4px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: var(--radius);
+      font-weight: 600; font-size: .88rem;
+      border: 2px solid transparent; cursor: pointer;
+      transition: all .15s; font-family: var(--font);
+    }
+    .btn-primary { background: var(--blue); color: var(--white); border-color: var(--blue); }
+    .btn-primary:hover { background: #133a68; }
+    .btn-danger { background: var(--red); color: var(--white); border-color: var(--red); }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-success { background: var(--green); color: var(--white); border-color: var(--green); }
+    .btn-outline { background: transparent; color: var(--gray-800); border-color: var(--gray-200); }
+    .btn-outline:hover { border-color: var(--gray-400); }
+    .btn-sm { padding: 5px 12px; font-size: .8rem; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* Availability calendar */
+    .avail-cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .avail-weekday-header {
+      text-align: center; font-size: .72rem; font-weight: 700;
+      color: var(--gray-400); padding: 4px 0; text-transform: uppercase;
+    }
+    .avail-day {
+      min-height: 80px;
+      border-radius: 8px;
+      border: 2px solid var(--gray-100);
+      padding: 6px 4px;
+      background: var(--white);
+    }
+    .avail-day.weekend { background: var(--gray-50); opacity: .5; }
+    .avail-day.past { opacity: .4; }
+    .avail-day-num { font-size: .75rem; font-weight: 700; color: var(--gray-400); margin-bottom: 5px; text-align: center; }
+    .avail-day:not(.weekend) .avail-day-num { color: var(--gray-800); }
+    .avail-slots { display: flex; flex-direction: column; gap: 3px; }
+    .avail-slot {
+      font-size: .65rem; font-weight: 700; padding: 3px 5px;
+      border-radius: 4px; text-align: center;
+      cursor: pointer; transition: all .15s; border: none;
+      font-family: var(--font);
+    }
+    .avail-slot.available { background: var(--green-light); color: var(--green); }
+    .avail-slot.available:hover { background: var(--green); color: var(--white); }
+    .avail-slot.booked { background: var(--blue-light); color: var(--blue); cursor: default; }
+    .avail-slot.blocked { background: var(--gray-100); color: var(--gray-400); }
+    .avail-slot.blocked:hover { background: var(--red-light); color: var(--red); }
+    .avail-cal-nav {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+    }
+    .avail-cal-nav h3 { font-size: 1rem; font-weight: 700; text-transform: capitalize; }
+
+    /* Bookings table */
+    .bookings-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    .bookings-table th {
+      text-align: left; padding: 10px 12px;
+      background: var(--gray-50); border-bottom: 2px solid var(--gray-200);
+      font-size: .75rem; text-transform: uppercase; letter-spacing: .05em;
+      color: var(--gray-400); font-weight: 700;
+    }
+    .bookings-table td { padding: 12px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+    .bookings-table tr:last-child td { border-bottom: none; }
+    .bookings-table tr:hover td { background: var(--gray-50); }
+    .status-badge {
+      display: inline-block; padding: 3px 9px; border-radius: 12px; font-size: .75rem; font-weight: 700;
+    }
+    .status-confirmed { background: var(--blue-light); color: var(--blue); }
+    .status-completed { background: var(--green-light); color: var(--green); }
+    .status-cancelled { background: var(--red-light); color: var(--red); }
+
+    /* Booking detail modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px;
+    }
+    .modal {
+      background: var(--white); border-radius: 16px; padding: 28px;
+      max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,.2);
+    }
+    .modal h2 { font-size: 1.1rem; margin-bottom: 16px; }
+    .modal-close { float: right; cursor: pointer; font-size: 1.3rem; color: var(--gray-400); line-height: 1; }
+    .detail-row { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: .88rem; }
+    .detail-label { font-weight: 600; min-width: 130px; color: var(--gray-600); flex-shrink: 0; }
+    .detail-val { color: var(--gray-800); }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+    /* Content editor */
+    .content-form { display: flex; flex-direction: column; gap: 16px; }
+    .cf-row label { display: block; font-size: .85rem; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+    .cf-row input, .cf-row textarea {
+      width: 100%; padding: 10px 14px;
+      border: 2px solid var(--gray-200); border-radius: var(--radius);
+      font-size: .9rem; font-family: var(--font); transition: border-color .15s;
+    }
+    .cf-row input:focus, .cf-row textarea:focus { outline: none; border-color: var(--blue); }
+    .cf-section-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--gray-400); margin: 8px 0 4px; }
+
+    /* Filters */
+    .filters { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .filters label { font-size: .85rem; font-weight: 600; color: var(--gray-600); }
+    .filters select, .filters input {
+      padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: var(--radius);
+      font-size: .88rem; font-family: var(--font); cursor: pointer;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: var(--gray-800); color: var(--white);
+      padding: 12px 20px; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 500;
+      animation: slideIn .2s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+    @keyframes slideIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
+      .sidebar-logout { position: static; width: 100%; }
+      .avail-cal-grid { font-size: .7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <h1>⚡ Admin Paneel</h1>
+    <p>Groepenkastenservice Maassluis</p>
+    <label for="admin-token-input">Toegangstoken</label>
+    <input type="password" id="admin-token-input" placeholder="Voer uw admin token in" autocomplete="current-password">
+    <div id="login-error">Ongeldig token. Probeer opnieuw.</div>
+    <button class="btn btn-primary btn-full" onclick="adminLogin()">Inloggen</button>
+  </div>
+</div>
+
+<!-- Admin App -->
+<div id="admin-app" class="admin-layout hidden">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      ⚡ Admin<br>
+      <span>Groepenkastenservice</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard">
+        <span class="icon">📊</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="showPage('availability')" data-page="availability">
+        <span class="icon">📅</span> Beschikbaarheid
+      </button>
+      <button class="nav-item" onclick="showPage('bookings')" data-page="bookings">
+        <span class="icon">📋</span> Boekingen
+      </button>
+      <button class="nav-item" onclick="showPage('content')" data-page="content">
+        <span class="icon">✏️</span> Inhoud &amp; SEO
+      </button>
+    </nav>
+    <div class="sidebar-logout">
+      <button class="nav-item" onclick="adminLogout()">
+        <span class="icon">🚪</span> Uitloggen
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- Dashboard -->
+    <div id="page-dashboard" class="page">
+      <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>Overzicht van uw boekingen en beschikbaarheid</p>
+      </div>
+      <div class="stats-grid" id="dashboard-stats">
+        <div class="stat-card"><div class="stat-label">Boekingen totaal</div><div class="stat-value" id="stat-total">–</div></div>
+        <div class="stat-card"><div class="stat-label">Bevestigd</div><div class="stat-value" id="stat-confirmed">–</div></div>
+        <div class="stat-card"><div class="stat-label">Voltooid</div><div class="stat-value" id="stat-completed">–</div></div>
+        <div class="stat-card"><div class="stat-label">Omzet (bevestigd)</div><div class="stat-value" id="stat-revenue">–</div><div class="stat-sub">excl. BTW</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Aankomende boekingen</h2><a href="#" onclick="showPage('bookings');return false;" class="btn btn-outline btn-sm">Alle boekingen</a></div>
+        <div class="card-body">
+          <table class="bookings-table" id="upcoming-table">
+            <thead><tr><th>Datum</th><th>Tijd</th><th>Klant</th><th>Totaal</th><th>Status</th><th></th></tr></thead>
+            <tbody id="upcoming-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div id="page-availability" class="page hidden">
+      <div class="page-header">
+        <h1>Beschikbaarheid</h1>
+        <p>Klik op een tijdslot om het te blokkeren of vrij te geven. Blauw = geboekt (niet wijzigbaar).</p>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="avail-cal-nav">
+            <button class="btn btn-outline btn-sm" onclick="availPrev()">‹ Vorige</button>
+            <h3 id="avail-month-label"></h3>
+            <button class="btn btn-outline btn-sm" onclick="availNext()">Volgende ›</button>
+          </div>
+          <div class="avail-cal-grid" id="avail-cal-grid"></div>
+          <div id="avail-legend" style="display:flex;gap:16px;margin-top:16px;font-size:.8rem;">
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#dcfce7;border:1px solid #86efac;display:inline-block"></span> Beschikbaar</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#e8f0fa;display:inline-block"></span> Geboekt</span>
+            <span style="display:flex;align-items:center;gap:5px;"><span style="width:12px;height:12px;border-radius:3px;background:#f1f5f9;display:inline-block"></span> Geblokkeerd</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings -->
+    <div id="page-bookings" class="page hidden">
+      <div class="page-header">
+        <h1>Alle boekingen</h1>
+        <p>Overzicht en beheer van alle geplande klussen</p>
+      </div>
+      <div class="filters">
+        <label>Maand:</label>
+        <input type="month" id="filter-month" onchange="loadBookings()">
+        <label>Status:</label>
+        <select id="filter-status" onchange="loadBookings()">
+          <option value="">Alle</option>
+          <option value="confirmed">Bevestigd</option>
+          <option value="completed">Voltooid</option>
+          <option value="cancelled">Geannuleerd</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table class="bookings-table" id="all-bookings-table">
+            <thead><tr><th>Datum</th><th>Tijd</th><th>Klant</th><th>Adres</th><th>Totaal</th><th>Status</th><th></th></tr></thead>
+            <tbody id="all-bookings-tbody"></tbody>
+          </table>
+          <div id="bookings-empty" class="hidden" style="padding:40px;text-align:center;color:#94a3b8;">Geen boekingen gevonden</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content / SEO -->
+    <div id="page-content" class="page hidden">
+      <div class="page-header">
+        <h1>Inhoud &amp; SEO</h1>
+        <p>Pas teksten, contactgegevens en SEO-instellingen aan</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Contactgegevens</h2></div>
+        <div class="card-body">
+          <div class="content-form" id="contact-form">
+            <div class="cf-row"><label>Telefoonnummer</label><input type="tel" id="cf-phone" placeholder="06-12345678"></div>
+            <div class="cf-row"><label>E-mailadres</label><input type="email" id="cf-email" placeholder="info@..."></div>
+            <div class="cf-row"><label>KVK-nummer</label><input type="text" id="cf-kvk"></div>
+            <div class="cf-row"><label>BTW-nummer</label><input type="text" id="cf-btw"></div>
+            <button class="btn btn-primary" onclick="saveContact()">Opslaan</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>SEO Instellingen</h2></div>
+        <div class="card-body">
+          <div class="content-form">
+            <div class="cf-row"><label>Paginatitel</label><input type="text" id="cf-meta-title"></div>
+            <div class="cf-row"><label>Meta beschrijving</label><textarea id="cf-meta-desc" rows="2"></textarea></div>
+            <div class="cf-row"><label>Trefwoorden</label><textarea id="cf-meta-keywords" rows="2"></textarea></div>
+            <button class="btn btn-primary" onclick="saveMeta()">Opslaan</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Hero tekst</h2></div>
+        <div class="card-body">
+          <div class="content-form">
+            <div class="cf-row"><label>Hoofdtitel</label><input type="text" id="cf-hero-title"></div>
+            <div class="cf-row"><label>Ondertitel</label><input type="text" id="cf-hero-sub"></div>
+            <button class="btn btn-primary" onclick="saveHero()">Opslaan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Booking detail modal -->
+<div id="booking-modal" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal">
+    <span class="modal-close" onclick="document.getElementById('booking-modal').classList.add('hidden')">&times;</span>
+    <h2>Boeking details</h2>
+    <div id="modal-content"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script src="/admin/js/admin.js"></script>
+</body>
+</html>

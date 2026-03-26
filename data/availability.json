@@ -1,0 +1,4 @@
+{
+  "_comment": "Per datum: true = beschikbaar, false = geblokkeerd/volgeboekt. Weekenden worden automatisch uitgesloten. Datums die hier NIET staan zijn standaard beschikbaar (als het een weekdag is in de toekomst).",
+  "blocked": {}
+}

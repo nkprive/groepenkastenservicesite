@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Groepenkast Vervangen & Uitbreiden Maassluis | Direct Inplannen",
+    "description": "Erkend elektricien in Maassluis. Groepenkast vervangen, extra groep aanleggen, kookgroep installatie. Transparante vaste prijzen. Direct online uw klus inplannen!",
+    "keywords": "groepenkast vervangen maassluis, elektricien maassluis, groepenkast uitbreiden, groepenkast kosten, elektricien westland, elektricien schiedam, groepenkast 3-fasen, aardlekschakelaar vervangen"
+  },
+  "hero": {
+    "title": "Groepenkast Specialist in Maassluis",
+    "subtitle": "Vaste prijzen. Geen verrassingen. Direct online inplannen.",
+    "description": "Erkend elektricien voor alle groepenkast werkzaamheden in Maassluis en omgeving. Bereken direct uw prijs en plan zelf een tijdsblok in.",
+    "cta_primary": "Bereken Uw Prijs",
+    "cta_secondary": "Bel Direct"
+  },
+  "about": {
+    "title": "Uw lokale groepenkast specialist",
+    "text": "Als zelfstandig erkend elektricien in Maassluis ben ik gespecialiseerd in alles rondom de groepenkast. Van het vervangen van een verouderde meterkast tot het aanleggen van extra groepen — ik werk met vaste transparante prijzen zodat u vooraf precies weet waar u aan toe bent. Geen uurtje-factuurtje, geen verrassingen achteraf.",
+    "highlights": [
+      "Erkend elektricien (NEN 1010 gecertificeerd)",
+      "Vaste prijzen, geen verborgen kosten",
+      "Werkzaam in Maassluis en 20km omgeving",
+      "Keuringsrapport beschikbaar na oplevering"
+    ]
+  },
+  "werkgebied": {
+    "title": "Werkgebied",
+    "description": "Ik werk vanuit Maassluis in een straal van 20 kilometer. Dit omvat onder andere: Maassluis, Vlaardingen, Schiedam, Hoek van Holland, Naaldwijk, Wateringen, Maasdijk, Den Hoorn, Delft (gedeeltelijk), Spijkenisse, Rozenburg en omliggende dorpen.",
+    "base_postcode": "3141AP",
+    "base_lat": 51.9183,
+    "base_lon": 4.2467,
+    "free_radius_km": 20,
+    "surcharge_per_km": 0.40
+  },
+  "faq": [
+    {
+      "question": "Hoe lang duurt het vervangen van een groepenkast?",
+      "answer": "Het vervangen van een groepenkast duurt gemiddeld 3 tot 5 uur, afhankelijk van de complexiteit. Een eenvoudige 1-fase meterkast met 8 groepen is vaak binnen een ochtend klaar. Bij een 3-fase uitvoering of wanneer er werkzaamheden in de kruipruimte nodig zijn, rekent u op een volle dag."
+    },
+    {
+      "question": "Moet de stroom af tijdens de werkzaamheden?",
+      "answer": "Ja, tijdens het vervangen van de groepenkast moet de stroom worden uitgeschakeld. Dit doe ik via het hoofdbord van de netbeheerder. U bent gemiddeld 3 tot 5 uur zonder stroom. Ik zorg dat dit zo kort mogelijk duurt."
+    },
+    {
+      "question": "Heb ik een vergunning nodig voor een nieuwe groepenkast?",
+      "answer": "Voor het vervangen of uitbreiden van een groepenkast is geen omgevingsvergunning nodig. Als erkend installateur mag ik deze werkzaamheden zelfstandig uitvoeren en registreren bij de netbeheerder."
+    },
+    {
+      "question": "Wanneer moet ik door de kruipruimte?",
+      "answer": "In oudere woningen lopen de aansluitkabels soms via de kruipruimte. Dit is per situatie verschillend. Als ik door de kruipruimte moet, rekenen we een vaste toeslag van €80. Dit weet ik bij aankomst zeker, dus geen verrassingen achteraf."
+    },
+    {
+      "question": "Wat is het verschil tussen 1-fase en 3-fase?",
+      "answer": "De meeste woningen hebben een 1-fase aansluiting (230V). Een 3-fase aansluiting (400V) biedt meer capaciteit en is verplicht voor zwaardere apparatuur zoals grote warmtepompen of snellaadpunten voor elektrische auto's. Twijfelt u? Ik adviseer u graag."
+    },
+    {
+      "question": "Wat houdt het NEN 1010 keuringsrapport in?",
+      "answer": "Na oplevering kan ik een officieel keuringsrapport (installatierappport conform NEN 1010) opstellen. Dit document bewijst dat uw installatie voldoet aan de Nederlandse normen. Dit is handig bij verkoop van uw woning of bij verzekeringseisen."
+    }
+  ],
+  "seo_content": {
+    "title": "Groepenkast vervangen in Maassluis en omgeving",
+    "blocks": [
+      {
+        "heading": "Waarom uw groepenkast vervangen?",
+        "text": "Een verouderde groepenkast kan problemen geven: storingen, uitvallende groepen of zelfs brandgevaar. Moderne groepenkassen zijn uitgerust met betere aardlekbeveiliging en bieden meer capaciteit voor uw huidige en toekomstige stroomverbruik. Denk aan het opladen van een elektrische auto, inductiekoken of een warmtepomp."
+      },
+      {
+        "heading": "Werkzaamheden in uw regio",
+        "text": "Ik ben actief in de regio Waterweg-Noord en omliggende gemeenten. Maassluis, Vlaardingen en Schiedam zijn mijn kerngebied. Maar ik werk ook regelmatig in Naaldwijk, Wateringen, Hoek van Holland, Maasdijk en Spijkenisse. Buiten de 20km gratis zone rekenen we een kleine reistoeslag."
+      }
+    ]
+  },
+  "contact": {
+    "phone": "06-12345678",
+    "email": "info@groepenkastenservice.nl",
+    "kvk": "12345678",
+    "btw": "NL123456789B01",
+    "address": "Maassluis, Zuid-Holland",
+    "hours": "Maandag t/m vrijdag, 9:00 - 17:00"
+  }
+}
