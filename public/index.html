@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Groepenkast Vervangen Maassluis | Direct Offerte & Inplannen</title>
-  <meta name="description" content="Erkend elektricien in Maassluis. Groepenkast vervangen, extra groep, kookgroep installatie. Vaste transparante prijzen. Stel direct uw offerte samen en plan online in.">
+  <meta name="description" content="Erkend elektricien in Maassluis. Groepenkast vervangen, extra groep, kookgroep installatie. Vaste transparante prijzen. Direct uw offerte samenstellen en online inplannen.">
   <meta name="keywords" content="groepenkast vervangen maassluis, elektricien maassluis, groepenkast uitbreiden, aardlekschakelaar vervangen, kookgroep installatie">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://groepenkastenservice-maassluis.nl/">
 
   <meta property="og:title" content="Groepenkast Specialist Maassluis | Direct Offerte Samenstellen">
-  <meta property="og:description" content="Erkend elektricien. Stel direct uw offerte samen, upload een foto en plan online in.">
+  <meta property="og:description" content="Erkend elektricien. Stel direct uw offerte samen, upload een foto en plan online in — zonder bellen.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="nl_NL">
 
@@ -57,7 +57,7 @@
         <span class="logo-location">Maassluis</span>
       </div>
     </div>
-    <a href="#wizard" class="btn btn-primary btn-sm header-cta">Offerte samenstellen →</a>
+    <a href="#offerte" class="btn btn-primary btn-sm">Offerte samenstellen →</a>
   </div>
 </header>
 
@@ -67,314 +67,284 @@
     <div class="hero-text">
       <div class="badge">Erkend Elektricien · Maassluis & Omgeving</div>
       <h1>Groepenkast vervangen of uitbreiden?</h1>
-      <p class="hero-sub">Stel direct uw offerte samen, upload een foto van uw situatie en plan zelf een datum in. Volledig online, zonder bellen.</p>
+      <p class="hero-sub">Klik op uw werkzaamheden en zie direct wat het kost. Upload een foto, kies een datum — klaar. Volledig online, zonder bellen.</p>
       <div class="hero-ctas">
-        <a href="#wizard" class="btn btn-primary btn-lg">Stel offerte samen →</a>
+        <a href="#offerte" class="btn btn-primary btn-lg">Stel uw offerte samen →</a>
       </div>
       <div class="hero-trust">
         <span>✓ NEN 1010 gecertificeerd</span>
-        <span>✓ Vaste prijzen</span>
+        <span>✓ Vaste transparante prijzen</span>
         <span>✓ Direct online inplannen</span>
       </div>
     </div>
     <div class="hero-visual">
       <div class="hero-card">
         <div class="hero-card-icon">⚡</div>
-        <h3>Hoe werkt het?</h3>
+        <h3>Zo werkt het</h3>
         <ol class="hero-steps-list">
-          <li><strong>1.</strong> Stel uw offerte samen</li>
-          <li><strong>2.</strong> Upload een foto van uw situatie</li>
-          <li><strong>3.</strong> Kies een datum en tijdslot</li>
-          <li><strong>4.</strong> Vul uw gegevens in</li>
+          <li>Klik op uw werkzaamheden</li>
+          <li>Upload een foto van uw situatie</li>
+          <li>Kies een datum in de agenda</li>
+          <li>Vul uw gegevens in &amp; verstuur</li>
         </ol>
-        <p class="hero-card-note">U ontvangt spoedig een bevestiging per e-mail.</p>
+        <p style="font-size:.85rem;color:rgba(255,255,255,.7);margin-top:12px">Bevestiging per e-mail — geen telefoontje nodig.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ WIZARD ════════════════════════════════════════════════════════════ -->
-<section class="section section-light wizard-section" id="wizard">
+<!-- ═══ OFFERTE + CALENDAR + FORM ═══════════════════════════════════════ -->
+<section class="section section-light" id="offerte">
   <div class="container">
 
-    <!-- Progress indicator -->
-    <div class="wiz-progress" id="wiz-progress">
-      <div class="wiz-prog-step active" data-step="1">
-        <div class="wiz-prog-num">1</div>
-        <div class="wiz-prog-label">Uw klus</div>
-      </div>
-      <div class="wiz-prog-line"></div>
-      <div class="wiz-prog-step" data-step="2">
-        <div class="wiz-prog-num">2</div>
-        <div class="wiz-prog-label">Situatie</div>
-      </div>
-      <div class="wiz-prog-line"></div>
-      <div class="wiz-prog-step" data-step="3">
-        <div class="wiz-prog-num">3</div>
-        <div class="wiz-prog-label">Datum</div>
-      </div>
-      <div class="wiz-prog-line"></div>
-      <div class="wiz-prog-step" data-step="4">
-        <div class="wiz-prog-num">4</div>
-        <div class="wiz-prog-label">Gegevens</div>
-      </div>
-    </div>
+    <div class="offerte-layout">
 
-    <!-- Wizard body: steps left, quote right -->
-    <div class="wiz-layout">
+      <!-- ─── LEFT: Progressive steps ───────────────────────────────── -->
+      <div class="offerte-steps">
 
-      <!-- ── STEPS ─────────────────────────────────────────── -->
-      <div class="wiz-steps-area">
-
-        <!-- STEP 1: Services -->
-        <div class="wiz-panel active" id="wiz-step-1">
-          <div class="wiz-panel-header">
-            <h2>Stel uw offerte samen</h2>
-            <p>Klik op de werkzaamheden die u wilt laten uitvoeren. Meerdere opties mogelijk.</p>
+        <!-- STAP 1: Werkzaamheden (always visible) -->
+        <div class="offerte-block" id="block-services">
+          <div class="block-header">
+            <div class="block-num active" id="bnum-1">1</div>
+            <div>
+              <h2>Wat wilt u laten uitvoeren?</h2>
+              <p>Klik op uw werkzaamheden. De offerte verschijnt direct naast u.</p>
+            </div>
           </div>
 
           <div class="option-group">
             <div class="option-group-label">Groepenkast vervangen</div>
-            <div class="tiles-grid tiles-4">
-              <div class="tile tile-radio" data-group="kast" data-id="kast-1f-8" data-price="600" data-name="Groepenkast 1-fase · 8 groepen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🔌</div>
-                <div class="tile-name">1-fase</div>
-                <div class="tile-sub">8 groepen</div>
-                <div class="tile-price">€ 600</div>
-              </div>
-              <div class="tile tile-radio" data-group="kast" data-id="kast-1f-12" data-price="700" data-name="Groepenkast 1-fase · 12 groepen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🔌</div>
-                <div class="tile-name">1-fase</div>
-                <div class="tile-sub">12 groepen</div>
-                <div class="tile-price">€ 700</div>
-              </div>
-              <div class="tile tile-radio" data-group="kast" data-id="kast-3f-8" data-price="900" data-name="Groepenkast 3-fase · 8 groepen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">⚡</div>
-                <div class="tile-name">3-fase</div>
-                <div class="tile-sub">8 groepen</div>
-                <div class="tile-price">€ 900</div>
-              </div>
-              <div class="tile tile-radio" data-group="kast" data-id="kast-3f-12" data-price="1100" data-name="Groepenkast 3-fase · 12 groepen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">⚡</div>
-                <div class="tile-name">3-fase</div>
-                <div class="tile-sub">12 groepen</div>
-                <div class="tile-price">€ 1.100</div>
-              </div>
+            <div class="tile-grid tiles-4">
+              <button type="button" class="svc-tile svc-tile-radio" data-group="kast" data-id="kast-1f-8" data-price="600" data-name="Groepenkast 1-fase · 8 groepen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🔌</span>
+                <span class="svc-tile-name">1-fase</span>
+                <span class="svc-tile-sub">8 groepen</span>
+                <span class="svc-tile-price">€ 600</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-radio" data-group="kast" data-id="kast-1f-12" data-price="700" data-name="Groepenkast 1-fase · 12 groepen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🔌</span>
+                <span class="svc-tile-name">1-fase</span>
+                <span class="svc-tile-sub">12 groepen</span>
+                <span class="svc-tile-price">€ 700</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-radio" data-group="kast" data-id="kast-3f-8" data-price="900" data-name="Groepenkast 3-fase · 8 groepen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">⚡</span>
+                <span class="svc-tile-name">3-fase</span>
+                <span class="svc-tile-sub">8 groepen</span>
+                <span class="svc-tile-price">€ 900</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-radio" data-group="kast" data-id="kast-3f-12" data-price="1100" data-name="Groepenkast 3-fase · 12 groepen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">⚡</span>
+                <span class="svc-tile-name">3-fase</span>
+                <span class="svc-tile-sub">12 groepen</span>
+                <span class="svc-tile-price">€ 1.100</span>
+              </button>
             </div>
           </div>
 
           <div class="option-group">
             <div class="option-group-label">Losse werkzaamheden of aanvulling</div>
-            <div class="tiles-grid tiles-3">
-              <div class="tile tile-check" data-id="extra-groep" data-price="200" data-name="Extra groep aanleggen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">➕</div>
-                <div class="tile-name">Extra groep</div>
-                <div class="tile-price">€ 200</div>
-              </div>
-              <div class="tile tile-check" data-id="kookgroep" data-price="250" data-name="Kookgroep installatie">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🍳</div>
-                <div class="tile-name">Kookgroep</div>
-                <div class="tile-price">€ 250</div>
-              </div>
-              <div class="tile tile-check" data-id="aardlek" data-price="150" data-name="Aardlekschakelaar vervangen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🛡️</div>
-                <div class="tile-name">Aardlekschakelaar</div>
-                <div class="tile-price">€ 150</div>
-              </div>
-              <div class="tile tile-check" data-id="wandcontact" data-price="75" data-name="Wandcontactdoos in meterkast">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🔧</div>
-                <div class="tile-name">Wandcontactdoos</div>
-                <div class="tile-price">€ 75</div>
-              </div>
-              <div class="tile tile-check" data-id="beltrafo" data-price="60" data-name="Beltrafo toevoegen">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🔔</div>
-                <div class="tile-name">Beltrafo</div>
-                <div class="tile-price">€ 60</div>
-              </div>
+            <div class="tile-grid tiles-3">
+              <button type="button" class="svc-tile svc-tile-check" data-id="extra-groep" data-price="200" data-name="Extra groep aanleggen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">➕</span>
+                <span class="svc-tile-name">Extra groep</span>
+                <span class="svc-tile-price">€ 200</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-check" data-id="kookgroep" data-price="250" data-name="Kookgroep installatie">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🍳</span>
+                <span class="svc-tile-name">Kookgroep</span>
+                <span class="svc-tile-price">€ 250</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-check" data-id="aardlek" data-price="150" data-name="Aardlekschakelaar vervangen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🛡️</span>
+                <span class="svc-tile-name">Aardlekschakelaar</span>
+                <span class="svc-tile-price">€ 150</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-check" data-id="wandcontact" data-price="75" data-name="Wandcontactdoos in meterkast">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🔧</span>
+                <span class="svc-tile-name">Wandcontactdoos</span>
+                <span class="svc-tile-price">€ 75</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-check" data-id="beltrafo" data-price="60" data-name="Beltrafo toevoegen">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🔔</span>
+                <span class="svc-tile-name">Beltrafo</span>
+                <span class="svc-tile-price">€ 60</span>
+              </button>
             </div>
           </div>
 
           <div class="option-group">
             <div class="option-group-label">Toeslagen</div>
-            <div class="tiles-grid tiles-2">
-              <div class="tile tile-check tile-addon" data-id="kruipruimte" data-price="80" data-name="Kruipruimte toeslag">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">🏠</div>
-                <div class="tile-name">Kruipruimte</div>
-                <div class="tile-sub">Kabels via kruipruimte</div>
-                <div class="tile-price">+ € 80</div>
-              </div>
-              <div class="tile tile-check tile-addon" data-id="keuring" data-price="150" data-name="Keuringsrapport (NEN 1010)">
-                <div class="tile-badge">✓</div>
-                <div class="tile-icon">📋</div>
-                <div class="tile-name">Keuringsrapport</div>
-                <div class="tile-sub">NEN 1010 rapport na oplevering</div>
-                <div class="tile-price">+ € 150</div>
-              </div>
+            <div class="tile-grid tiles-2">
+              <button type="button" class="svc-tile svc-tile-check svc-tile-addon" data-id="kruipruimte" data-price="80" data-name="Kruipruimte toeslag">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">🏠</span>
+                <span class="svc-tile-name">Kruipruimte</span>
+                <span class="svc-tile-sub">Kabels via kruipruimte</span>
+                <span class="svc-tile-price">+ € 80</span>
+              </button>
+              <button type="button" class="svc-tile svc-tile-check svc-tile-addon" data-id="keuring" data-price="150" data-name="Keuringsrapport (NEN 1010)">
+                <span class="svc-tile-check">✓</span>
+                <span class="svc-tile-icon">📋</span>
+                <span class="svc-tile-name">Keuringsrapport</span>
+                <span class="svc-tile-sub">NEN 1010 na oplevering</span>
+                <span class="svc-tile-price">+ € 150</span>
+              </button>
             </div>
           </div>
+        </div><!-- end block-services -->
 
-          <div class="wiz-nav wiz-nav-right">
-            <button class="btn btn-primary btn-lg" id="step1-next" onclick="wizGoTo(2)">
-              Volgende: uw situatie →
-            </button>
-          </div>
-        </div>
-
-        <!-- STEP 2: Situatie (postcode + foto) -->
-        <div class="wiz-panel" id="wiz-step-2">
-          <div class="wiz-panel-header">
-            <h2>Uw situatie</h2>
-            <p>Vul uw postcode in en upload een foto van uw huidige groepenkast.</p>
-          </div>
-
-          <div class="situation-grid">
-            <div class="situation-col">
-              <h3 class="sit-label">📍 Uw postcode</h3>
-              <p class="sit-desc">Wij controleren of u binnen ons werkgebied valt (20km rondom Maassluis).</p>
-              <div class="postcode-row">
-                <input type="text" id="postcode-input" placeholder="bijv. 3142 BD" maxlength="7" autocomplete="postal-code">
-                <button type="button" id="postcode-btn" class="btn btn-sm">Controleer</button>
+        <!-- STAP 2: Situatie — auto-reveals after service selected -->
+        <div class="reveal-block" id="block-situatie">
+          <div class="offerte-block">
+            <div class="block-header">
+              <div class="block-num" id="bnum-2">2</div>
+              <div>
+                <h2>Uw situatie</h2>
+                <p>Vul uw postcode in en upload een foto van uw groepenkast (verplicht).</p>
               </div>
-              <div id="postcode-result" class="postcode-result"></div>
             </div>
 
-            <div class="situation-col">
-              <h3 class="sit-label">📷 Foto van uw groepenkast</h3>
-              <p class="sit-desc">Upload een duidelijke foto zodat wij uw situatie goed kunnen beoordelen.</p>
-              <div class="photo-drop" id="photo-drop">
-                <input type="file" id="photo-input" accept="image/*" hidden>
-                <div class="photo-drop-inner" id="photo-drop-inner">
-                  <div class="photo-drop-icon">📷</div>
-                  <p>Klik hier of sleep een foto</p>
-                  <span>JPG, PNG, HEIC — max 15MB</span>
+            <div class="situation-grid">
+              <div class="situation-col">
+                <div class="sit-label">📍 Uw postcode</div>
+                <p class="sit-desc">Wij controleren of u binnen ons werkgebied valt (20 km rondom Maassluis). Buiten 20 km rekenen wij €0,40/km.</p>
+                <div class="postcode-row">
+                  <input type="text" id="postcode-input" placeholder="bijv. 3142 BD" maxlength="7" autocomplete="postal-code">
+                  <button type="button" id="postcode-btn" class="btn btn-sm">Controleer</button>
                 </div>
-                <div class="photo-preview-wrap hidden" id="photo-preview-wrap">
-                  <img id="photo-preview-img" src="" alt="Voorbeeld groepenkast">
-                  <button type="button" class="photo-remove" id="photo-remove">✕ Verwijder</button>
-                </div>
-                <div class="photo-uploading hidden" id="photo-uploading">
-                  <div class="spinner"></div> Foto uploaden…
-                </div>
+                <div id="postcode-result" class="postcode-result"></div>
               </div>
-              <div id="photo-result" class="photo-result"></div>
+
+              <div class="situation-col">
+                <div class="sit-label">📷 Foto van uw groepenkast</div>
+                <p class="sit-desc">Upload een duidelijke foto zodat wij uw situatie kunnen beoordelen.</p>
+                <div class="photo-drop" id="photo-drop">
+                  <input type="file" id="photo-input" accept="image/*" hidden>
+                  <div class="photo-drop-inner" id="photo-drop-inner">
+                    <span class="photo-drop-icon">📷</span>
+                    <p>Klik of sleep een foto</p>
+                    <span>JPG, PNG, HEIC — max 15 MB</span>
+                  </div>
+                  <div class="photo-preview-wrap hidden" id="photo-preview-wrap">
+                    <img id="photo-preview-img" src="" alt="Foto groepenkast">
+                    <button type="button" class="photo-remove" id="photo-remove">✕ Verwijder</button>
+                  </div>
+                  <div class="photo-uploading hidden" id="photo-uploading">
+                    <div class="spinner"></div> Foto uploaden…
+                  </div>
+                </div>
+                <div id="photo-result" class="photo-result"></div>
+              </div>
             </div>
           </div>
+        </div><!-- end block-situatie -->
 
-          <div class="wiz-nav wiz-nav-split">
-            <button class="btn btn-outline-dark" onclick="wizGoTo(1)">← Terug</button>
-            <button class="btn btn-primary btn-lg" onclick="wizGoTo(3)">Volgende: datum kiezen →</button>
-          </div>
-        </div>
-
-        <!-- STEP 3: Datum -->
-        <div class="wiz-panel" id="wiz-step-3">
-          <div class="wiz-panel-header">
-            <h2>Kies een datum</h2>
-            <p>Klik op een groen tijdslot om uw afspraak in te plannen.</p>
-          </div>
-
-          <div class="calendar-wrap">
-            <div class="calendar-nav">
-              <button type="button" id="cal-prev" class="cal-nav-btn">‹</button>
-              <span id="cal-month-label" class="cal-month-label"></span>
-              <button type="button" id="cal-next" class="cal-nav-btn">›</button>
-            </div>
-            <div class="calendar-legend">
-              <span class="legend-item"><span class="dot dot-available"></span> Beschikbaar</span>
-              <span class="legend-item"><span class="dot dot-full"></span> Volgeboekt</span>
-              <span class="legend-item"><span class="dot dot-selected"></span> Uw keuze</span>
-            </div>
-            <div id="calendar-grid" class="calendar-grid"></div>
-            <div id="cal-loading" class="cal-loading hidden">Beschikbaarheid ophalen…</div>
-          </div>
-
-          <div class="wiz-nav wiz-nav-split">
-            <button class="btn btn-outline-dark" onclick="wizGoTo(2)">← Terug</button>
-            <button class="btn btn-primary btn-lg" id="step3-next" onclick="wizGoTo(4)" disabled>Volgende: uw gegevens →</button>
-          </div>
-        </div>
-
-        <!-- STEP 4: Gegevens + submit -->
-        <div class="wiz-panel" id="wiz-step-4">
-          <div class="wiz-panel-header">
-            <h2>Uw gegevens</h2>
-            <p>Vul uw gegevens in. Wij bevestigen uw aanvraag zo spoedig mogelijk per e-mail.</p>
-          </div>
-
-          <form id="booking-form" class="booking-form" novalidate>
-            <div class="form-row">
-              <label for="f-name">Naam *</label>
-              <input type="text" id="f-name" name="name" required autocomplete="name" placeholder="Jan de Vries">
-            </div>
-            <div class="form-row">
-              <label for="f-email">E-mailadres *</label>
-              <input type="email" id="f-email" name="email" required autocomplete="email" placeholder="jan@email.nl">
-            </div>
-            <div class="form-row">
-              <label for="f-address">Adres werkzaamheden *</label>
-              <input type="text" id="f-address" name="address" required autocomplete="street-address" placeholder="Straatnaam 1, Maassluis">
-            </div>
-            <div class="form-row">
-              <label for="f-notes">Aanvullende opmerkingen</label>
-              <textarea id="f-notes" name="notes" rows="3" placeholder="Bijv. type woning, bijzonderheden, bereikbaarheid…"></textarea>
+        <!-- STAP 3: Datum — auto-reveals after photo uploaded -->
+        <div class="reveal-block" id="block-datum">
+          <div class="offerte-block">
+            <div class="block-header">
+              <div class="block-num" id="bnum-3">3</div>
+              <div>
+                <h2>Kies een datum</h2>
+                <p>Klik op een groen tijdslot om uw gewenste datum te selecteren.</p>
+              </div>
             </div>
 
-            <!-- Quote recap before submit -->
-            <div class="form-recap" id="form-recap"></div>
-
-            <button type="submit" id="book-submit-btn" class="btn btn-primary btn-full btn-lg">
-              Aanvraag versturen ✓
-            </button>
-            <p class="form-privacy">Na uw aanvraag ontvangt u een bevestiging per e-mail. Uw gegevens worden uitsluitend gebruikt voor het plannen van uw afspraak.</p>
-          </form>
-
-          <div class="wiz-nav wiz-nav-back">
-            <button class="btn btn-outline-dark" onclick="wizGoTo(3)">← Terug naar datum</button>
+            <div class="calendar-wrap">
+              <div class="calendar-nav">
+                <button type="button" id="cal-prev" class="cal-nav-btn">‹</button>
+                <span id="cal-month-label" class="cal-month-label"></span>
+                <button type="button" id="cal-next" class="cal-nav-btn">›</button>
+              </div>
+              <div class="calendar-legend">
+                <span class="legend-item"><span class="dot dot-available"></span> Beschikbaar</span>
+                <span class="legend-item"><span class="dot dot-full"></span> Volgeboekt</span>
+                <span class="legend-item"><span class="dot dot-selected"></span> Uw keuze</span>
+              </div>
+              <div id="calendar-grid" class="calendar-grid"></div>
+              <div id="cal-loading" class="cal-loading hidden">Beschikbaarheid ophalen…</div>
+            </div>
           </div>
-        </div>
+        </div><!-- end block-datum -->
 
-      </div><!-- end wiz-steps-area -->
+        <!-- STAP 4: Gegevens — auto-reveals after slot selected -->
+        <div class="reveal-block" id="block-gegevens">
+          <div class="offerte-block">
+            <div class="block-header">
+              <div class="block-num" id="bnum-4">4</div>
+              <div>
+                <h2>Uw gegevens</h2>
+                <p>Wij bevestigen uw aanvraag zo spoedig mogelijk per e-mail.</p>
+              </div>
+            </div>
 
-      <!-- ── QUOTE SIDEBAR ─────────────────────────────────── -->
-      <div class="wiz-quote-area">
+            <form id="booking-form" class="booking-form" novalidate>
+              <div class="form-row">
+                <label for="f-name">Naam *</label>
+                <input type="text" id="f-name" name="name" required autocomplete="name" placeholder="Jan de Vries">
+              </div>
+              <div class="form-row">
+                <label for="f-email">E-mailadres *</label>
+                <input type="email" id="f-email" name="email" required autocomplete="email" placeholder="jan@email.nl">
+              </div>
+              <div class="form-row">
+                <label for="f-address">Adres werkzaamheden *</label>
+                <input type="text" id="f-address" name="address" required autocomplete="street-address" placeholder="Straatnaam 1, Maassluis">
+              </div>
+              <div class="form-row">
+                <label for="f-notes">Aanvullende informatie</label>
+                <textarea id="f-notes" name="notes" rows="3" placeholder="Bijv. type woning, bijzonderheden, bereikbaarheid…"></textarea>
+              </div>
+
+              <div class="form-recap" id="form-recap"></div>
+
+              <button type="submit" id="book-submit-btn" class="btn btn-primary btn-full btn-lg">
+                Aanvraag versturen ✓
+              </button>
+              <p class="form-privacy">Na uw aanvraag ontvangt u een bevestiging per e-mail. Uw gegevens worden uitsluitend gebruikt voor het plannen van uw afspraak.</p>
+            </form>
+          </div>
+        </div><!-- end block-gegevens -->
+
+      </div><!-- end offerte-steps -->
+
+      <!-- ─── RIGHT: Sticky live offerte ────────────────────────────── -->
+      <div class="offerte-quote">
         <div class="quote-card" id="quote-card">
           <div class="quote-card-header">
             <h3>Uw offerte</h3>
-            <span class="quote-step-badge" id="quote-step-badge">Stap 1 van 4</span>
           </div>
           <div class="quote-empty" id="quote-empty">
-            <p>Selecteer uw werkzaamheden om de offerte op te stellen.</p>
+            <p>Klik links op uw werkzaamheden om de offerte op te stellen.</p>
           </div>
           <ul class="quote-items" id="quote-items"></ul>
           <div class="quote-totals hidden" id="quote-totals">
-            <div class="qt-row" id="qt-subtotal-row">
-              <span>Subtotaal</span><span id="qt-subtotal">€ 0</span>
-            </div>
             <div class="qt-row qt-surcharge hidden" id="qt-surcharge-row">
-              <span>Reistoeslag (<span id="qt-surcharge-km">0</span> km)</span>
+              <span>Reistoeslag (<span id="qt-surcharge-km">0</span> km × €0,40)</span>
               <span id="qt-surcharge">€ 0</span>
             </div>
             <div class="qt-row qt-total">
-              <span>Totaal excl. BTW</span><span id="qt-total">€ 0</span>
+              <span>Totaal excl. BTW</span>
+              <span id="qt-total">€ 0</span>
             </div>
           </div>
           <div class="quote-slot-box hidden" id="quote-slot-box">
-            <div class="quote-slot-label" id="quote-slot-label"></div>
+            <span id="quote-slot-label"></span>
           </div>
         </div>
       </div>
 
-    </div><!-- end wiz-layout -->
+    </div><!-- end offerte-layout -->
   </div>
 </section>
 
@@ -385,13 +355,13 @@
       <div class="success-icon">✓</div>
       <h2>Aanvraag ontvangen!</h2>
       <p id="success-message"></p>
-      <p class="success-sub">U ontvangt <strong>spoedig een bevestiging per e-mail</strong> met alle details van uw afspraak.</p>
+      <p class="success-sub">U ontvangt <strong>spoedig een bevestiging per e-mail</strong> met alle details.</p>
     </div>
   </div>
 </section>
 
 <!-- ═══ WHY ME ═════════════════════════════════════════════════════════════ -->
-<section class="section section-light" id="voordelen">
+<section class="section" id="voordelen">
   <div class="container">
     <div class="section-header">
       <h2>Waarom kiezen voor ons?</h2>
@@ -422,7 +392,7 @@
 </section>
 
 <!-- ═══ SERVICES DETAIL (SEO) ══════════════════════════════════════════════ -->
-<section class="section" id="diensten">
+<section class="section section-light" id="diensten">
   <div class="container">
     <div class="section-header">
       <h2>Onze diensten</h2>
@@ -480,7 +450,7 @@
 </section>
 
 <!-- ═══ WERKGEBIED (SEO) ════════════════════════════════════════════════════ -->
-<section class="section section-light" id="werkgebied">
+<section class="section" id="werkgebied">
   <div class="container">
     <div class="section-header">
       <h2>Werkgebied</h2>
@@ -497,7 +467,7 @@
         </div>
       </div>
       <div class="werkgebied-note">
-        <strong>Buiten 20km?</strong>
+        <strong>Buiten 20 km?</strong>
         <p>Vul uw postcode in bij stap 2. De reistoeslag wordt automatisch berekend en zichtbaar in uw offerte.</p>
       </div>
     </div>
@@ -505,7 +475,7 @@
 </section>
 
 <!-- ═══ FAQ (SEO) ═══════════════════════════════════════════════════════════ -->
-<section class="section" id="faq">
+<section class="section section-light" id="faq">
   <div class="container">
     <div class="section-header">
       <h2>Veelgestelde vragen</h2>
@@ -516,7 +486,7 @@
 <script type="application/ld+json" id="faq-schema"></script>
 
 <!-- ═══ SEO CONTENT ══════════════════════════════════════════════════════════ -->
-<section class="section section-light" id="seo-content">
+<section class="section" id="seo-content">
   <div class="container">
     <div id="seo-blocks"></div>
   </div>
@@ -532,10 +502,10 @@
     <div class="footer-col">
       <h4>Diensten</h4>
       <ul>
-        <li><a href="#wizard">Groepenkast vervangen</a></li>
-        <li><a href="#wizard">Extra groep aanleggen</a></li>
-        <li><a href="#wizard">Kookgroep installatie</a></li>
-        <li><a href="#wizard">Aardlekschakelaar</a></li>
+        <li><a href="#offerte">Groepenkast vervangen</a></li>
+        <li><a href="#offerte">Extra groep aanleggen</a></li>
+        <li><a href="#offerte">Kookgroep installatie</a></li>
+        <li><a href="#offerte">Aardlekschakelaar</a></li>
       </ul>
     </div>
     <div class="footer-col">
