@@ -950,8 +950,8 @@ ul { list-style: none; }
 .ob-groepen-ctrl {
   display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
 }
-.ob-groepen-label { font-size: .9rem; font-weight: 500; color: var(--gray-700); }
-.ob-groepen-hint { font-size: .82rem; color: var(--blue); font-weight: 500; }
+.ob-groepen-label { font-size: .9rem; font-weight: 500; color: var(--gray-700); flex: 1; }
+.ob-groepen-hint { font-size: .83rem; color: var(--blue); font-style: italic; white-space: nowrap; margin-left: auto; }
 
 /* ── Live offerte section ── */
 .ob-quote {
