@@ -103,142 +103,216 @@
 
         <div class="qb-card-header">
           <h2>Stel uw opdracht samen</h2>
-          <p>Selecteer wat u wilt laten uitvoeren. U kunt werkzaamheden combineren — de offerte verschijnt direct hieronder.</p>
+          <p>Kies wat u wilt laten uitvoeren. De offerte wordt direct hieronder opgesteld.</p>
         </div>
 
-        <!-- ── SECTIE 1: Groepenkast vervangen ── -->
-        <div class="qb-section">
-          <div class="qb-section-label">
-            <span class="qb-section-label-icon">🔌</span>
-            Groepenkast vervangen
-          </div>
-
-          <div class="qb-row qb-row-radio" data-group="kast" data-id="kast-1f-8" data-price="600" data-name="Groepenkast 1-fase · 8 groepen" role="radio" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">1-fase · 8 groepen</span>
-              <span class="qb-row-desc">Standaard woonhuis, bestaande aansluiting</span>
-            </div>
-            <span class="qb-row-price">€ 600</span>
-          </div>
-
-          <div class="qb-row qb-row-radio" data-group="kast" data-id="kast-1f-12" data-price="700" data-name="Groepenkast 1-fase · 12 groepen" role="radio" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">1-fase · 12 groepen</span>
-              <span class="qb-row-desc">Meer capaciteit, moderne woning</span>
-            </div>
-            <span class="qb-row-price">€ 700</span>
-          </div>
-
-          <div class="qb-row qb-row-radio" data-group="kast" data-id="kast-3f-8" data-price="900" data-name="Groepenkast 3-fase · 8 groepen" role="radio" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">3-fase · 8 groepen</span>
-              <span class="qb-row-desc">Zware verbruikers, laadpaal, airco</span>
-            </div>
-            <span class="qb-row-price">€ 900</span>
-          </div>
-
-          <div class="qb-row qb-row-radio" data-group="kast" data-id="kast-3f-12" data-price="1100" data-name="Groepenkast 3-fase · 12 groepen" role="radio" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">3-fase · 12 groepen</span>
-              <span class="qb-row-desc">Maximale capaciteit, groot verbruik</span>
-            </div>
-            <span class="qb-row-price">€ 1.100</span>
-          </div>
+        <!-- ── Type keuze ── -->
+        <div class="qb-type-choice" id="qb-type-choice">
+          <button type="button" class="type-card" id="type-nieuw" data-type="nieuw">
+            <span class="type-card-icon">🔌</span>
+            <span class="type-card-title">Nieuwe groepenkast</span>
+            <span class="type-card-desc">Volledige vervanging van uw huidige kast</span>
+          </button>
+          <button type="button" class="type-card" id="type-aanp" data-type="aanp">
+            <span class="type-card-icon">🔧</span>
+            <span class="type-card-title">Aanpassing bestaande kast</span>
+            <span class="type-card-desc">Uitbreiding of wijziging van uw huidige kast</span>
+          </button>
         </div>
 
-        <!-- ── SECTIE 2: Groepenkast uitbreiden / losse werkzaamheden ── -->
-        <div class="qb-section">
-          <div class="qb-section-label">
-            <span class="qb-section-label-icon">🔧</span>
-            Uitbreiden of losse werkzaamheden
+        <!-- ══ PICKER: Nieuwe groepenkast ══ -->
+        <div class="qb-picker hidden" id="picker-nieuw">
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">⚡</span> Aansluitingsfase</div>
+            <div class="fase-keuze" id="fase-keuze-nieuw">
+              <button type="button" class="fase-btn" data-fase="1fase">1-fase<span>€ 350</span></button>
+              <button type="button" class="fase-btn" data-fase="3fase">3-fase<span>€ 450</span></button>
+            </div>
           </div>
 
-          <!-- Extra groep — met aantal-kiezer -->
-          <div class="qb-row qb-row-check" data-id="extra-groep" data-price="200" data-name="Extra groep aanleggen" data-has-qty="true" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Extra groep aanleggen</span>
-              <span class="qb-row-desc">Stopcontact, airco, laadpaal — €200 per groep</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🔢</span> Aantal groepen</div>
+            <div class="groepen-keuze" id="groepen-keuze">
+              <button type="button" class="groep-btn" data-groepen="8" data-price="400">8<span>€ 400</span></button>
+              <button type="button" class="groep-btn selected" data-groepen="10" data-price="500">10<span>€ 500</span></button>
+              <button type="button" class="groep-btn" data-groepen="12" data-price="600">12<span>€ 600</span></button>
+              <button type="button" class="groep-btn" data-groepen="custom" data-price="0">Eigen</button>
             </div>
-            <div class="qb-qty-ctrl hidden" id="qty-ctrl-extra-groep">
-              <button type="button" class="qty-btn" data-dir="-1" data-id="extra-groep" tabindex="-1">−</button>
-              <span class="qty-display" id="qty-val-extra-groep">1</span>
-              <button type="button" class="qty-btn" data-dir="1" data-id="extra-groep" tabindex="-1">+</button>
+            <div class="groep-custom-wrap hidden" id="groep-custom-wrap">
+              <input type="number" id="groep-custom-input" min="1" max="99" placeholder="Aantal groepen">
+              <span class="groep-custom-hint">× € 50 per groep</span>
             </div>
-            <span class="qb-row-price" id="price-extra-groep">€ 200</span>
           </div>
 
-          <div class="qb-row qb-row-check" data-id="kookgroep" data-price="250" data-name="Kookgroep installatie" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Kookgroep installatie</span>
-              <span class="qb-row-desc">Inductiefornuis of elektrisch kooktoestel</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🍳</span> Kookgroep</div>
+            <div class="qb-row qb-row-check" data-path="nieuw" data-id="kookgroep" role="checkbox" tabindex="0" aria-checked="false">
+              <div class="qb-indicator"></div>
+              <div class="qb-row-content">
+                <span class="qb-row-name">Kookgroep toevoegen</span>
+                <span class="qb-row-desc">Voor inductiefornuis of elektrisch kooktoestel</span>
+              </div>
+              <span class="qb-row-price">+ € 110</span>
             </div>
-            <span class="qb-row-price">€ 250</span>
           </div>
 
-          <div class="qb-row qb-row-check" data-id="aardlek" data-price="150" data-name="Aardlekschakelaar vervangen" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Aardlekschakelaar vervangen</span>
-              <span class="qb-row-desc">Defect of verouderd exemplaar</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🔋</span> Batterij aansluiting</div>
+            <div class="conn-keuze" data-conn="batterij" data-path="nieuw">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
             </div>
-            <span class="qb-row-price">€ 150</span>
           </div>
 
-          <div class="qb-row qb-row-check" data-id="wandcontact" data-price="75" data-name="Wandcontactdoos in meterkast" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Wandcontactdoos in meterkast</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🚗</span> Laadpaal aansluiting</div>
+            <div class="conn-keuze" data-conn="laadpaal" data-path="nieuw">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
             </div>
-            <span class="qb-row-price">€ 75</span>
           </div>
 
-          <div class="qb-row qb-row-check" data-id="beltrafo" data-price="60" data-name="Beltrafo toevoegen" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Beltrafo toevoegen</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">☀️</span> Zonnepanelen aansluiting</div>
+            <div class="conn-keuze" data-conn="zonnepanelen" data-path="nieuw">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
             </div>
-            <span class="qb-row-price">€ 60</span>
-          </div>
-        </div>
-
-        <!-- ── SECTIE 3: Toeslagen ── -->
-        <div class="qb-section">
-          <div class="qb-section-label">
-            <span class="qb-section-label-icon">📋</span>
-            Toeslagen
           </div>
 
-          <div class="qb-row qb-row-check" data-id="kruipruimte" data-price="80" data-name="Kruipruimte toeslag" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Kruipruimte toeslag</span>
-              <span class="qb-row-desc">Kabels via kruipruimte leiden</span>
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">➕</span> Extra's</div>
+            <div class="extras-list">
+              <div class="extra-row" data-path="nieuw" data-id="beltrafo" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Beltrafo</span>
+                <span class="extra-price">+ € 100</span>
+              </div>
+              <div class="extra-row" data-path="nieuw" data-id="overspanning" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Overspanningsbeveiliging</span>
+                <span class="extra-price">+ € 250</span>
+              </div>
+              <div class="extra-row extra-row-qty" data-path="nieuw" data-id="stopcontact" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Extra stopcontact</span>
+                <div class="extra-qty-ctrl hidden" id="nieuw-stopcontact-qty">
+                  <button type="button" class="qty-btn" data-dir="-1" data-target="nieuw-stopcontact">−</button>
+                  <span class="qty-display" id="nieuw-stopcontact-val">1</span>
+                  <button type="button" class="qty-btn" data-dir="1" data-target="nieuw-stopcontact">+</button>
+                </div>
+                <span class="extra-price" id="nieuw-stopcontact-price">+ € 65</span>
+              </div>
             </div>
-            <span class="qb-row-price">+ € 80</span>
           </div>
 
-          <div class="qb-row qb-row-check" data-id="keuring" data-price="150" data-name="Keuringsrapport (NEN 1010)" role="checkbox" tabindex="0" aria-checked="false">
-            <div class="qb-indicator"></div>
-            <div class="qb-row-content">
-              <span class="qb-row-name">Keuringsrapport (NEN 1010)</span>
-              <span class="qb-row-desc">Officieel rapport na oplevering</span>
+        </div><!-- end picker-nieuw -->
+
+        <!-- ══ PICKER: Aanpassing bestaande groepenkast ══ -->
+        <div class="qb-picker hidden" id="picker-aanp">
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">⚡</span> Fase-uitbreiding</div>
+            <div class="qb-row qb-row-check" data-path="aanp" data-id="naar3fase" role="checkbox" tabindex="0" aria-checked="false">
+              <div class="qb-indicator"></div>
+              <div class="qb-row-content">
+                <span class="qb-row-name">1-fase uitbreiden naar 3-fase</span>
+                <span class="qb-row-desc">Meer capaciteit voor zware verbruikers</span>
+              </div>
+              <span class="qb-row-price">+ € 250</span>
             </div>
-            <span class="qb-row-price">+ € 150</span>
           </div>
-        </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🔢</span> Extra groepen</div>
+            <div class="extra-groepen-wrap">
+              <span class="extra-groepen-label">Aantal extra groepen</span>
+              <div class="extra-groepen-ctrl">
+                <button type="button" class="qty-btn" id="aanp-groepen-min">−</button>
+                <span class="qty-display" id="aanp-groepen-val">0</span>
+                <button type="button" class="qty-btn" id="aanp-groepen-plus">+</button>
+              </div>
+              <span class="extra-groepen-hint" id="aanp-groepen-hint"></span>
+            </div>
+          </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🍳</span> Kookgroep</div>
+            <div class="qb-row qb-row-check" data-path="aanp" data-id="kookgroep" role="checkbox" tabindex="0" aria-checked="false">
+              <div class="qb-indicator"></div>
+              <div class="qb-row-content">
+                <span class="qb-row-name">Kookgroep toevoegen</span>
+                <span class="qb-row-desc">Voor inductiefornuis of elektrisch kooktoestel</span>
+              </div>
+              <span class="qb-row-price">+ € 110</span>
+            </div>
+          </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🔋</span> Batterij aansluiting</div>
+            <div class="conn-keuze" data-conn="batterij" data-path="aanp">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
+            </div>
+          </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">🚗</span> Laadpaal aansluiting</div>
+            <div class="conn-keuze" data-conn="laadpaal" data-path="aanp">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
+            </div>
+          </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">☀️</span> Zonnepanelen aansluiting</div>
+            <div class="conn-keuze" data-conn="zonnepanelen" data-path="aanp">
+              <button type="button" class="conn-btn selected" data-val="geen">Geen</button>
+              <button type="button" class="conn-btn" data-val="1fase">1-fase<span>+ € 150</span></button>
+              <button type="button" class="conn-btn" data-val="3fase">3-fase<span>+ € 250</span></button>
+            </div>
+          </div>
+
+          <div class="qb-section">
+            <div class="qb-section-label"><span class="qb-section-label-icon">➕</span> Extra's</div>
+            <div class="extras-list">
+              <div class="extra-row" data-path="aanp" data-id="beltrafo" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Beltrafo</span>
+                <span class="extra-price">+ € 100</span>
+              </div>
+              <div class="extra-row" data-path="aanp" data-id="overspanning" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Overspanningsbeveiliging</span>
+                <span class="extra-price">+ € 250</span>
+              </div>
+              <div class="extra-row extra-row-qty" data-path="aanp" data-id="stopcontact" role="checkbox" tabindex="0" aria-checked="false">
+                <div class="extra-check"></div>
+                <span class="extra-name">Extra stopcontact</span>
+                <div class="extra-qty-ctrl hidden" id="aanp-stopcontact-qty">
+                  <button type="button" class="qty-btn" data-dir="-1" data-target="aanp-stopcontact">−</button>
+                  <span class="qty-display" id="aanp-stopcontact-val">1</span>
+                  <button type="button" class="qty-btn" data-dir="1" data-target="aanp-stopcontact">+</button>
+                </div>
+                <span class="extra-price" id="aanp-stopcontact-price">+ € 65</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end picker-aanp -->
 
         <!-- ── Geïntegreerde Offerte ── -->
         <div class="qb-quote" id="qb-quote">
           <div class="qb-quote-heading">Uw offerte</div>
 
           <div class="qb-quote-empty" id="qb-quote-empty">
-            Maak een selectie hierboven om uw offerte op te stellen.
+            Kies hierboven wat u wilt laten uitvoeren.
           </div>
 
           <div id="qb-quote-items"></div>
