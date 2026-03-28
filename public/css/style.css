@@ -406,7 +406,7 @@ ul { list-style: none; }
   align-items: start;
 }
 
-.calendar-wrap { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; }
+.calendar-wrap { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 24px; max-width: 600px; margin: 0 auto; width: 100%; }
 
 .calendar-nav {
   display: flex;

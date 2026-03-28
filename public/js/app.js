@@ -3,8 +3,6 @@
  */
 
 var API = '/api';
-var BTW = 1.21;
-
 var PRICES = null;
 
 var state = {
@@ -13,7 +11,6 @@ var state = {
   nieuw: {
     fase: null,
     groepen: 10,
-    groependPrice: 0,
     kookgroep: false,
     batterij: 'geen', laadpaal: 'geen', zonnepanelen: 'geen',
     beltrafo: false, overspanning: false, stopcontact: 0,
@@ -56,7 +53,8 @@ function linesNieuw() {
   var lines = [];
   if (n.fase) {
     lines.push({ name: 'Groepenkast ' + (n.fase === '1fase' ? '1-fase' : '3-fase'), price: n.fase === '1fase' ? PRICES.nieuw.fase_1 : PRICES.nieuw.fase_3 });
-    lines.push({ name: n.groepen + ' groepen', price: n.groependPrice });
+    var gp = PRICES.nieuw.groepen_eerste + Math.max(0, n.groepen - 1) * PRICES.nieuw.groepen_extra;
+    lines.push({ name: n.groepen + ' groepen', price: gp });
   }
   if (n.kookgroep)             lines.push({ name: 'Kookgroep', price: PRICES.nieuw.kookgroep });
   if (n.batterij !== 'geen')   lines.push({ name: 'Batterij (' + n.batterij + ')', price: connPrice('nieuw', n.batterij) });
@@ -100,8 +98,7 @@ function hasSelection() { return state.type !== null && getLines().length > 0; }
 /* ─── Live offerte ───────────────────────────────────────── */
 function updateOfferte() {
   var lines    = getLines();
-  var exclBTW  = getTotal();
-  var inclBTW  = Math.round(exclBTW * BTW * 100) / 100;
+  var total    = getTotal();
   var emptyEl  = document.getElementById('ob-quote-empty');
   var linesEl  = document.getElementById('ob-quote-lines');
   var totalsEl = document.getElementById('ob-quote-totals');
@@ -135,8 +132,7 @@ function updateOfferte() {
     surchargeRow.classList.add('hidden');
   }
 
-  document.getElementById('ob-total-incl-val').textContent = fmtP(inclBTW);
-  document.getElementById('ob-total-val').textContent = fmtP(exclBTW);
+  document.getElementById('ob-total-val').textContent = fmtP(total);
 }
 
 /* ─── Vul prijslabels in UI ──────────────────────────────── */
@@ -150,7 +146,6 @@ function vulPrijsLabels() {
       el.textContent = '+ ' + fmtP(val);
     }
   });
-  state.nieuw.groependPrice = PRICES.nieuw.groepen_per_stuk * state.nieuw.groepen;
   updateNieuwGroepenHint();
 }
 
@@ -184,7 +179,6 @@ function initOB() {
   document.getElementById('nieuw-groepen-min').addEventListener('click', function() {
     if (state.nieuw.groepen <= 1) return;
     state.nieuw.groepen--;
-    state.nieuw.groependPrice = PRICES ? state.nieuw.groepen * PRICES.nieuw.groepen_per_stuk : 0;
     document.getElementById('nieuw-groepen-val').textContent = state.nieuw.groepen;
     updateNieuwGroepenHint();
     updateOfferte();
@@ -192,7 +186,6 @@ function initOB() {
   document.getElementById('nieuw-groepen-plus').addEventListener('click', function() {
     if (state.nieuw.groepen >= 40) return;
     state.nieuw.groepen++;
-    state.nieuw.groependPrice = PRICES ? state.nieuw.groepen * PRICES.nieuw.groepen_per_stuk : 0;
     document.getElementById('nieuw-groepen-val').textContent = state.nieuw.groepen;
     updateNieuwGroepenHint();
     updateOfferte();
@@ -335,8 +328,9 @@ function updateNieuwGroepenHint() {
   var hint = document.getElementById('nieuw-groepen-hint');
   if (!hint || !PRICES) return;
   var n = state.nieuw.groepen;
-  var p = n * PRICES.nieuw.groepen_per_stuk;
-  hint.textContent = n + ' \u00d7 \u20ac' + PRICES.nieuw.groepen_per_stuk + ' = \u20ac' + fmt(p);
+  var p = PRICES.nieuw.groepen_eerste + Math.max(0, n - 1) * PRICES.nieuw.groepen_extra;
+  hint.textContent = fmtP(p) +
+    (n === 1 ? ' (1e groep)' : ' (1e \u20ac' + PRICES.nieuw.groepen_eerste + ' + ' + (n - 1) + '\u00d7\u20ac' + PRICES.nieuw.groepen_extra + ')');
 }
 
 function updateAanpHint() {
@@ -536,8 +530,7 @@ function toonFormulier() {
   label.textContent = d + ' \u00b7 ' + t;
 
   var lines    = getLines();
-  var exclBTW  = getTotal();
-  var inclBTW  = Math.round(exclBTW * BTW * 100) / 100;
+  var total    = getTotal();
   var summaryEl = document.getElementById('form-summary');
   summaryEl.innerHTML =
     '<div class="form-summary-label">Samenvatting</div>' +
@@ -548,8 +541,7 @@ function toonFormulier() {
     (state.surchargeEur > 0
       ? '<div class="form-summary-row"><span>Reistoeslag</span><span>' + fmtP(state.surchargeEur) + '</span></div>'
       : '') +
-    '<div class="form-summary-row form-summary-total"><span>Totaal incl. BTW</span><span>' + fmtP(inclBTW) + '</span></div>' +
-    '<div class="form-summary-row" style="font-size:.8rem;color:var(--gray-400)"><span>Excl. BTW</span><span>' + fmtP(exclBTW) + '</span></div>';
+    '<div class="form-summary-row form-summary-total"><span>Totaal incl. BTW</span><span>' + fmtP(total) + '</span></div>';
 
   wrap.style.display = '';
   wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -620,7 +612,6 @@ function laadPrijzen() {
     .then(function(r) { return r.json(); })
     .then(function(p) {
       PRICES = p;
-      state.nieuw.groependPrice = p.nieuw.groepen_per_stuk * state.nieuw.groepen;
       vulPrijsLabels();
       updateOfferte();
     })
