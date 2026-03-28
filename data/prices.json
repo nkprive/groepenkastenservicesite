@@ -1,0 +1,27 @@
+{
+  "nieuw": {
+    "fase_1": 350,
+    "fase_3": 450,
+    "groepen_8": 400,
+    "groepen_10": 500,
+    "groepen_12": 600,
+    "groepen_per_stuk": 50,
+    "kookgroep": 110,
+    "conn_1fase": 150,
+    "conn_3fase": 250,
+    "beltrafo": 100,
+    "overspanning": 250,
+    "stopcontact_per_stuk": 65
+  },
+  "aanp": {
+    "naar_3fase": 250,
+    "extra_groep_eerste": 100,
+    "extra_groep_extra": 65,
+    "kookgroep": 110,
+    "conn_1fase": 150,
+    "conn_3fase": 250,
+    "beltrafo": 100,
+    "overspanning": 250,
+    "stopcontact_per_stuk": 65
+  }
+}

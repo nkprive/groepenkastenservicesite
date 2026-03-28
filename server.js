@@ -50,6 +50,7 @@ const DATA = {
   availability: () => path.join(__dirname, 'data', 'availability.json'),
   bookings: () => path.join(__dirname, 'data', 'bookings.json'),
   content: () => path.join(__dirname, 'data', 'content.json'),
+  prices: () => path.join(__dirname, 'data', 'prices.json'),
 };
 
 async function readJSON(file) {
@@ -173,8 +174,8 @@ app.post('/api/bookings', async (req, res) => {
     const { date, slot, customer, services, total, distance_km, surcharge_eur, notes } = req.body;
 
     // Validation
-    if (!date || !slot || !customer?.name || !customer?.email || !customer?.phone) {
-      return res.status(400).json({ error: 'Verplichte velden ontbreken: date, slot, customer.name, customer.email, customer.phone' });
+    if (!date || !slot || !customer?.name || !customer?.email) {
+      return res.status(400).json({ error: 'Verplichte velden ontbreken: date, slot, customer.name, customer.email' });
     }
     if (!['am', 'pm'].includes(slot)) {
       return res.status(400).json({ error: 'slot moet "am" of "pm" zijn' });
@@ -233,6 +234,19 @@ app.post('/api/bookings', async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Serverfout bij aanmaken boeking' });
+  }
+});
+
+/**
+ * GET /api/prices
+ * Returns current price configuration (public)
+ */
+app.get('/api/prices', async (req, res) => {
+  try {
+    const prices = await readJSON(DATA.prices());
+    res.json(prices);
+  } catch (e) {
+    res.status(500).json({ error: 'Serverfout' });
   }
 });
 
@@ -366,6 +380,44 @@ app.put('/api/admin/availability', adminAuth, async (req, res) => {
 
     await writeJSON(DATA.availability(), avail);
     res.json({ success: true, date, blocked: avail.blocked[date] || {} });
+  } catch (e) {
+    res.status(500).json({ error: 'Serverfout' });
+  }
+});
+
+/**
+ * GET /api/admin/prices
+ * Returns current price configuration
+ */
+app.get('/api/admin/prices', adminAuth, async (req, res) => {
+  try {
+    const prices = await readJSON(DATA.prices());
+    res.json(prices);
+  } catch (e) {
+    res.status(500).json({ error: 'Serverfout' });
+  }
+});
+
+/**
+ * PUT /api/admin/prices
+ * Update price configuration
+ * Body: full prices object or partial (deep merged)
+ */
+app.put('/api/admin/prices', adminAuth, async (req, res) => {
+  try {
+    const current = await readJSON(DATA.prices());
+    const updated = deepMerge(current, req.body);
+    // Ensure all values are numbers
+    for (const section of Object.keys(updated)) {
+      for (const key of Object.keys(updated[section])) {
+        updated[section][key] = Number(updated[section][key]);
+        if (isNaN(updated[section][key])) {
+          return res.status(400).json({ error: `Ongeldige prijs voor ${section}.${key}` });
+        }
+      }
+    }
+    await writeJSON(DATA.prices(), updated);
+    res.json({ success: true, prices: updated });
   } catch (e) {
     res.status(500).json({ error: 'Serverfout' });
   }

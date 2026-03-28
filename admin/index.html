@@ -51,6 +51,13 @@
     }
     .login-card input:focus { outline: none; border-color: var(--blue); }
     #login-error { color: var(--red); font-size: .85rem; margin-bottom: 12px; display: none; }
+    .prices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
+    .price-row { display: flex; flex-direction: column; gap: 4px; }
+    .price-row label { font-size: .82rem; font-weight: 600; color: var(--gray-600); }
+    .price-input-wrap { display: flex; align-items: center; border: 2px solid var(--gray-200); border-radius: 8px; overflow: hidden; background: var(--white); }
+    .price-input-wrap span { padding: 0 10px; font-weight: 600; color: var(--gray-400); background: var(--gray-50); border-right: 1px solid var(--gray-200); font-size: .9rem; }
+    .price-input-wrap input { border: none; outline: none; padding: 9px 12px; font-size: .95rem; font-family: var(--font); width: 100%; }
+    @media (max-width: 600px) { .prices-grid { grid-template-columns: 1fr; } }
 
     /* Admin layout */
     .admin-layout { display: flex; min-height: 100vh; }
@@ -299,6 +306,9 @@
       <button class="nav-item" onclick="showPage('content')" data-page="content">
         <span class="icon">✏️</span> Inhoud &amp; SEO
       </button>
+      <button class="nav-item" onclick="showPage('prices')" data-page="prices">
+        <span class="icon">💶</span> Prijzen
+      </button>
     </nav>
     <div class="sidebar-logout">
       <button class="nav-item" onclick="adminLogout()">
@@ -422,6 +432,56 @@
             <button class="btn btn-primary" onclick="saveHero()">Opslaan</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Prijzen -->
+    <div id="page-prices" class="page hidden">
+      <div class="page-header">
+        <h1>Prijzen beheren</h1>
+        <p>Pas hier de prijzen aan die zichtbaar zijn in de offerte-samensteller op de website.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>🔌 Nieuwe groepenkast</h2></div>
+        <div class="card-body">
+          <div class="prices-grid" id="prices-nieuw-grid">
+            <div class="price-row"><label>1-fase aansluiting</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-fase_1" min="0"></div></div>
+            <div class="price-row"><label>3-fase aansluiting</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-fase_3" min="0"></div></div>
+            <div class="price-row"><label>8 groepen</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-groepen_8" min="0"></div></div>
+            <div class="price-row"><label>10 groepen</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-groepen_10" min="0"></div></div>
+            <div class="price-row"><label>12 groepen</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-groepen_12" min="0"></div></div>
+            <div class="price-row"><label>Eigen aantal (per groep)</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-groepen_per_stuk" min="0"></div></div>
+            <div class="price-row"><label>Kookgroep</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-kookgroep" min="0"></div></div>
+            <div class="price-row"><label>Verbinding 1-fase (batterij/laadpaal/zon)</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-conn_1fase" min="0"></div></div>
+            <div class="price-row"><label>Verbinding 3-fase (batterij/laadpaal/zon)</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-conn_3fase" min="0"></div></div>
+            <div class="price-row"><label>Beltrafo</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-beltrafo" min="0"></div></div>
+            <div class="price-row"><label>Overspanningsbeveiliging</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-overspanning" min="0"></div></div>
+            <div class="price-row"><label>Extra stopcontact (per stuk)</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-nieuw-stopcontact_per_stuk" min="0"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h2>🔧 Aanpassing bestaande groepenkast</h2></div>
+        <div class="card-body">
+          <div class="prices-grid">
+            <div class="price-row"><label>Uitbreiding naar 3-fase</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-naar_3fase" min="0"></div></div>
+            <div class="price-row"><label>1e extra groep</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-extra_groep_eerste" min="0"></div></div>
+            <div class="price-row"><label>Elke volgende extra groep</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-extra_groep_extra" min="0"></div></div>
+            <div class="price-row"><label>Kookgroep</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-kookgroep" min="0"></div></div>
+            <div class="price-row"><label>Verbinding 1-fase</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-conn_1fase" min="0"></div></div>
+            <div class="price-row"><label>Verbinding 3-fase</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-conn_3fase" min="0"></div></div>
+            <div class="price-row"><label>Beltrafo</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-beltrafo" min="0"></div></div>
+            <div class="price-row"><label>Overspanningsbeveiliging</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-overspanning" min="0"></div></div>
+            <div class="price-row"><label>Extra stopcontact (per stuk)</label><div class="price-input-wrap"><span>€</span><input type="number" id="p-aanp-stopcontact_per_stuk" min="0"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px;display:flex;gap:12px;align-items:center">
+        <button class="btn btn-primary" onclick="savePrices()">Prijzen opslaan</button>
+        <span id="prices-status" style="font-size:.85rem;color:var(--green)"></span>
       </div>
     </div>
 

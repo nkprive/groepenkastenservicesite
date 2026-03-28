@@ -1,164 +1,369 @@
 /**
- * Groepenkastenservice Maassluis — Frontend App
+ * Groepenkastenservice — Offerte Builder v2
  *
- * Sections:
- *  1. Config & State
- *  2. Price Calculator
- *  3. Postcode Check
- *  4. Calendar
- *  5. Booking Form
- *  6. Content Loader (CMS)
- *  7. FAQ
- *  8. Utilities
- *  9. Init
+ * Flow:
+ *  Stap 1 — type keuze (nieuw / aanpassing)
+ *  Stap 2 — picker voor het gekozen type; offerte groeit live mee
+ *  "Kies een datum" → booking sectie verschijnt
+ *  Kalender → formulier → bevestiging
  */
 
-// ═══════════════════════════════════════════════════════════
-// 1. CONFIG & STATE
-// ═══════════════════════════════════════════════════════════
+var API = '/api';
 
-const API = '/api';
+/* ─── Prices (loaded from server) ───────────────────────── */
+var PRICES = null; // set by laadPrijzen()
 
-// Services definition (mirrors server-side knowledge)
-const SERVICES = {
-  // Radio group: groepenkast type
-  kast: {
-    'kast-1f-8':  { name: 'Groepenkast 1-fase · 8 groepen',  price: 600 },
-    'kast-1f-12': { name: 'Groepenkast 1-fase · 12 groepen', price: 700 },
-    'kast-3f-8':  { name: 'Groepenkast 3-fase · 8 groepen',  price: 900 },
-    'kast-3f-12': { name: 'Groepenkast 3-fase · 12 groepen', price: 1100 },
+/* ─── State ──────────────────────────────────────────────── */
+var state = {
+  type: null,  // 'nieuw' | 'aanp'
+
+  nieuw: {
+    fase: null,        // '1fase' | '3fase'
+    groepen: 10,       // number
+    groependPrice: 0,  // set after prices loaded
+    kookgroep: false,
+    batterij: 'geen', laadpaal: 'geen', zonnepanelen: 'geen',
+    beltrafo: false, overspanning: false, stopcontact: 0,
   },
-  // Checkboxes
-  checkboxes: {
-    'extra-groep': { name: 'Extra groep aanleggen',          price: 200 },
-    'kookgroep':   { name: 'Kookgroep installatie',          price: 250 },
-    'aardlek':     { name: 'Aardlekschakelaar vervangen',    price: 150 },
-    'wandcontact': { name: 'Wandcontactdoos in meterkast',   price: 75  },
-    'beltrafo':    { name: 'Beltrafo toevoegen',             price: 60  },
-    'kruipruimte': { name: 'Kruipruimte toeslag',            price: 80  },
-    'keuring':     { name: 'Keuringsrapport (NEN 1010)',     price: 150 },
+
+  aanp: {
+    naar3fase: false,
+    extraGroepen: 0,
+    kookgroep: false,
+    batterij: 'geen', laadpaal: 'geen', zonnepanelen: 'geen',
+    beltrafo: false, overspanning: false, stopcontact: 0,
   },
+
+  postcodeRaw: '', distanceKm: 0, surchargeEur: 0,
+  selectedDate: null, selectedSlot: null,
+  calYear: null, calMonth: null,
+  availability: {}, calLoaded: false,
+  content: {},
 };
 
-const state = {
-  selectedKast: null,      // key from SERVICES.kast
-  selectedExtras: new Set(), // keys from SERVICES.checkboxes
-  subtotal: 0,
-  distanceKm: 0,
-  surchargeEur: 0,
-  distanceLat: null,
-  distanceLon: null,
-  postcodeValid: false,
-  selectedDate: null,      // 'YYYY-MM-DD'
-  selectedSlot: null,      // 'am' | 'pm'
-  calYear: null,
-  calMonth: null,          // 1-based
-  availability: {},        // { 'YYYY-MM-DD': { am: bool, pm: bool } }
-  content: {},             // From content.json
-};
-
-// ═══════════════════════════════════════════════════════════
-// 2. PRICE CALCULATOR
-// ═══════════════════════════════════════════════════════════
-
-function initCalculator() {
-  // Radio buttons (kast type)
-  document.querySelectorAll('input[name="kast"]').forEach(input => {
-    input.addEventListener('change', () => {
-      state.selectedKast = input.checked ? input.value : null;
-      updateCalculator();
-    });
-  });
-
-  // Checkboxes
-  Object.keys(SERVICES.checkboxes).forEach(key => {
-    const input = document.querySelector(`input[name="${key}"]`);
-    if (!input) return;
-    input.addEventListener('change', () => {
-      if (input.checked) state.selectedExtras.add(key);
-      else state.selectedExtras.delete(key);
-      updateCalculator();
-    });
-  });
+/* ─── Helpers ────────────────────────────────────────────── */
+function fmt(n) {
+  return n.toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+function fmtP(n) { return '€\u00a0' + fmt(n); }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function updateCalculator() {
-  const items = getSelectedItems();
-  state.subtotal = items.reduce((sum, i) => sum + i.price, 0);
+function connPrice(path, val) {
+  if (!PRICES || val === 'geen') return 0;
+  return val === '1fase' ? PRICES[path].conn_1fase : PRICES[path].conn_3fase;
+}
 
-  const isEmpty = items.length === 0;
-  const priceEmpty = document.getElementById('price-empty');
-  const priceList = document.getElementById('price-list');
-  const priceDistanceWrap = document.getElementById('price-distance');
-  const priceTotalBlock = document.getElementById('price-total-block');
-  const bookBtnWrap = document.getElementById('book-btn-wrap');
+/* ─── Price lines per pad ────────────────────────────────── */
+function linesNieuw() {
+  if (!PRICES) return [];
+  var n = state.nieuw;
+  var lines = [];
+  if (n.fase) {
+    var faseP = n.fase === '1fase' ? PRICES.nieuw.fase_1 : PRICES.nieuw.fase_3;
+    lines.push({ name: 'Groepenkast ' + (n.fase === '1fase' ? '1-fase' : '3-fase'), price: faseP });
+    lines.push({ name: n.groepen + ' groepen', price: n.groendendPrice || n.groependPrice });
+  }
+  if (n.kookgroep)             lines.push({ name: 'Kookgroep', price: PRICES.nieuw.kookgroep });
+  if (n.batterij !== 'geen')   lines.push({ name: 'Batterij aansluiting (' + n.batterij + ')', price: connPrice('nieuw', n.batterij) });
+  if (n.laadpaal !== 'geen')   lines.push({ name: 'Laadpaal aansluiting (' + n.laadpaal + ')', price: connPrice('nieuw', n.laadpaal) });
+  if (n.zonnepanelen !== 'geen') lines.push({ name: 'Zonnepanelen aansluiting (' + n.zonnepanelen + ')', price: connPrice('nieuw', n.zonnepanelen) });
+  if (n.beltrafo)              lines.push({ name: 'Beltrafo', price: PRICES.nieuw.beltrafo });
+  if (n.overspanning)          lines.push({ name: 'Overspanningsbeveiliging', price: PRICES.nieuw.overspanning });
+  if (n.stopcontact > 0)       lines.push({ name: 'Extra stopcontact', price: PRICES.nieuw.stopcontact_per_stuk * n.stopcontact, qty: n.stopcontact });
+  return lines;
+}
 
-  if (isEmpty) {
-    priceEmpty.classList.remove('hidden');
-    priceList.classList.add('hidden');
-    priceDistanceWrap.classList.add('hidden');
-    priceTotalBlock.classList.add('hidden');
-    bookBtnWrap.classList.add('hidden');
+function linesAanp() {
+  if (!PRICES) return [];
+  var a = state.aanp;
+  var lines = [];
+  if (a.naar3fase)             lines.push({ name: 'Uitbreiding naar 3-fase', price: PRICES.aanp.naar_3fase });
+  if (a.extraGroepen > 0) {
+    var p = PRICES.aanp.extra_groep_eerste + Math.max(0, a.extraGroepen - 1) * PRICES.aanp.extra_groep_extra;
+    lines.push({ name: 'Extra groepen', price: p, qty: a.extraGroepen });
+  }
+  if (a.kookgroep)             lines.push({ name: 'Kookgroep', price: PRICES.aanp.kookgroep });
+  if (a.batterij !== 'geen')   lines.push({ name: 'Batterij aansluiting (' + a.batterij + ')', price: connPrice('aanp', a.batterij) });
+  if (a.laadpaal !== 'geen')   lines.push({ name: 'Laadpaal aansluiting (' + a.laadpaal + ')', price: connPrice('aanp', a.laadpaal) });
+  if (a.zonnepanelen !== 'geen') lines.push({ name: 'Zonnepanelen aansluiting (' + a.zonnepanelen + ')', price: connPrice('aanp', a.zonnepanelen) });
+  if (a.beltrafo)              lines.push({ name: 'Beltrafo', price: PRICES.aanp.beltrafo });
+  if (a.overspanning)          lines.push({ name: 'Overspanningsbeveiliging', price: PRICES.aanp.overspanning });
+  if (a.stopcontact > 0)       lines.push({ name: 'Extra stopcontact', price: PRICES.aanp.stopcontact_per_stuk * a.stopcontact, qty: a.stopcontact });
+  return lines;
+}
+
+function getLines() {
+  if (state.type === 'nieuw') return linesNieuw();
+  if (state.type === 'aanp')  return linesAanp();
+  return [];
+}
+
+function getSubtotal() { return getLines().reduce(function(s,l){ return s + l.price; }, 0); }
+function getTotal()    { return getSubtotal() + state.surchargeEur; }
+
+function hasSelection() {
+  if (!state.type) return false;
+  var lines = getLines();
+  return lines.length > 0;
+}
+
+/* ─── Update live offerte ────────────────────────────────── */
+function updateOfferte() {
+  var lines    = getLines();
+  var total    = getTotal();
+  var emptyEl  = document.getElementById('ob-quote-empty');
+  var linesEl  = document.getElementById('ob-quote-lines');
+  var totalsEl = document.getElementById('ob-quote-totals');
+  var actionEl = document.getElementById('ob-quote-action');
+
+  if (lines.length === 0 && state.surchargeEur === 0) {
+    emptyEl.style.display = '';
+    linesEl.innerHTML = '';
+    totalsEl.classList.add('hidden');
+    actionEl.classList.add('hidden');
     return;
   }
 
-  // Populate price list
-  priceEmpty.classList.add('hidden');
-  priceList.classList.remove('hidden');
-  priceDistanceWrap.classList.remove('hidden');
-  priceTotalBlock.classList.remove('hidden');
-  bookBtnWrap.classList.remove('hidden');
+  emptyEl.style.display = 'none';
+  totalsEl.classList.remove('hidden');
+  actionEl.classList.remove('hidden');
 
-  priceList.innerHTML = items.map(i =>
-    `<li><span class="item-name">${escHtml(i.name)}</span><span class="item-price">€ ${fmtPrice(i.price)}</span></li>`
-  ).join('');
+  linesEl.innerHTML = lines.map(function(l) {
+    var label = l.qty && l.qty > 1 ? esc(l.name) + ' (\u00d7' + l.qty + ')' : esc(l.name);
+    return '<div class="ob-quote-line">' +
+      '<span class="ob-ql-name">' + label + '</span>' +
+      '<span class="ob-ql-price">' + fmtP(l.price) + '</span></div>';
+  }).join('');
 
-  renderPriceTotals();
-}
-
-function getSelectedItems() {
-  const items = [];
-  if (state.selectedKast && SERVICES.kast[state.selectedKast]) {
-    items.push(SERVICES.kast[state.selectedKast]);
-  }
-  for (const key of state.selectedExtras) {
-    if (SERVICES.checkboxes[key]) items.push(SERVICES.checkboxes[key]);
-  }
-  return items;
-}
-
-function renderPriceTotals() {
-  const total = state.subtotal + state.surchargeEur;
-  document.getElementById('subtotal-val').textContent = `€ ${fmtPrice(state.subtotal)}`;
-  document.getElementById('total-val').textContent = `€ ${fmtPrice(total)}`;
-
-  const surchargeRow = document.getElementById('surcharge-row');
+  var surchargeRow = document.getElementById('ob-surcharge-row');
   if (state.surchargeEur > 0) {
     surchargeRow.classList.remove('hidden');
-    document.getElementById('surcharge-km').textContent = Math.round(state.distanceKm - 20);
-    document.getElementById('surcharge-val').textContent = `€ ${fmtPrice(state.surchargeEur)}`;
+    document.getElementById('ob-surcharge-km').textContent = Math.round(state.distanceKm - 20);
+    document.getElementById('ob-surcharge-val').textContent = fmtP(state.surchargeEur);
   } else {
     surchargeRow.classList.add('hidden');
   }
+
+  document.getElementById('ob-total-val').textContent = fmtP(total);
 }
 
-// ═══════════════════════════════════════════════════════════
-// 3. POSTCODE CHECK
-// ═══════════════════════════════════════════════════════════
+/* ─── Vul prijslabels in de UI ──────────────────────────── */
+function vulPrijsLabels() {
+  if (!PRICES) return;
+  document.querySelectorAll('[data-price-ref]').forEach(function(el) {
+    var ref = el.getAttribute('data-price-ref');
+    var parts = ref.split('.');
+    var val = PRICES[parts[0]] && PRICES[parts[0]][parts[1]];
+    if (typeof val === 'number') {
+      // prefix with + € for conn prices, otherwise just € X
+      var isConn = parts[1].startsWith('conn_') || parts[1].startsWith('naar_')
+        || parts[1].startsWith('kookgroep') || parts[1].startsWith('beltrafo')
+        || parts[1].startsWith('overspanning') || parts[1].startsWith('stopcontact');
+      if (el.closest('.ob-check-price') || el.closest('.ob-opt-price')) {
+        el.textContent = '+ ' + fmtP(val);
+      } else {
+        el.textContent = fmtP(val);
+      }
+    }
+  });
 
+  // Default groependPrice (10 groepen)
+  state.nieuw.groependPrice = PRICES.nieuw.groepen_10;
+}
+
+/* ─── Offerte Builder init ───────────────────────────────── */
+function initOB() {
+
+  // Type keuze
+  document.querySelectorAll('.ob-type-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var type = btn.dataset.type;
+      document.querySelectorAll('.ob-type-btn').forEach(function(b){ b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      state.type = type;
+      document.getElementById('picker-nieuw').classList.add('hidden');
+      document.getElementById('picker-aanp').classList.add('hidden');
+      document.getElementById('picker-' + type).classList.remove('hidden');
+      updateOfferte();
+    });
+  });
+
+  // ── Fase knoppen (nieuw) ──
+  document.querySelectorAll('#fase-row .ob-opt-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#fase-row .ob-opt-btn').forEach(function(b){ b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      state.nieuw.fase = btn.dataset.val;
+      updateOfferte();
+    });
+  });
+
+  // ── Groepen knoppen (nieuw) ──
+  document.querySelectorAll('#groepen-row .ob-opt-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#groepen-row .ob-opt-btn').forEach(function(b){ b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      var customWrap = document.getElementById('groep-custom-wrap');
+      if (btn.dataset.val === 'custom') {
+        customWrap.classList.remove('hidden');
+        var n = parseInt(document.getElementById('groep-custom-input').value, 10);
+        state.nieuw.groepen = isNaN(n) || n < 1 ? null : n;
+        state.nieuw.groependPrice = PRICES ? (isNaN(n) || n < 1 ? 0 : n * PRICES.nieuw.groepen_per_stuk) : 0;
+      } else {
+        customWrap.classList.add('hidden');
+        state.nieuw.groepen = parseInt(btn.dataset.val, 10);
+        var key = 'groepen_' + btn.dataset.val;
+        state.nieuw.groependPrice = PRICES ? PRICES.nieuw[key] : 0;
+      }
+      updateOfferte();
+    });
+  });
+
+  document.getElementById('groep-custom-input').addEventListener('input', function() {
+    var n = parseInt(this.value, 10);
+    if (n >= 1 && PRICES) {
+      state.nieuw.groepen = n;
+      state.nieuw.groependPrice = n * PRICES.nieuw.groepen_per_stuk;
+      updateOfferte();
+    }
+  });
+
+  // ── Conn knoppen (beide pads) ──
+  document.querySelectorAll('.ob-btn-row[data-conn]').forEach(function(row) {
+    var conn = row.dataset.conn;
+    var path = row.dataset.path;
+    row.querySelectorAll('.ob-opt-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        row.querySelectorAll('.ob-opt-btn').forEach(function(b){ b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        state[path][conn] = btn.dataset.val;
+        updateOfferte();
+      });
+    });
+  });
+
+  // ── Check rows (kookgroep, naar3fase, beltrafo, overspanning) ──
+  document.querySelectorAll('.ob-check-row[data-path][data-id]').forEach(function(row) {
+    var path = row.dataset.path;
+    var id   = row.dataset.id;
+    if (id === 'stopcontact') return; // handled separately
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.ob-qty-ctrl')) return;
+      var checked = row.classList.toggle('selected');
+      row.setAttribute('aria-checked', checked ? 'true' : 'false');
+      if (id === 'naar3fase') {
+        state.aanp.naar3fase = checked;
+      } else {
+        state[path][id] = checked;
+      }
+      updateOfferte();
+    });
+    row.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+  });
+
+  // ── Stopcontact rows ──
+  document.querySelectorAll('.ob-check-row-qty[data-id="stopcontact"]').forEach(function(row) {
+    var path = row.dataset.path;
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.ob-qty-ctrl')) return;
+      var checked = row.classList.toggle('selected');
+      var qtyEl = document.getElementById(path + '-stopcontact-qty');
+      if (checked) {
+        state[path].stopcontact = 1;
+        if (qtyEl) qtyEl.classList.remove('hidden');
+      } else {
+        state[path].stopcontact = 0;
+        if (qtyEl) qtyEl.classList.add('hidden');
+        var valEl = document.getElementById(path + '-stopcontact-val');
+        if (valEl) valEl.textContent = '1';
+        var prEl = document.getElementById(path + '-stopcontact-price');
+        if (prEl && PRICES) prEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk);
+      }
+      updateOfferte();
+    });
+    row.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+  });
+
+  // ── Stopcontact qty knoppen ──
+  document.querySelectorAll('.ob-qty-btn[data-target]').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var dir    = parseInt(btn.dataset.dir, 10);
+      var target = btn.dataset.target; // e.g. 'nieuw-stopcontact'
+      var path   = target.split('-')[0];
+      var cur    = state[path].stopcontact;
+      var nw     = Math.max(1, Math.min(20, cur + dir));
+      state[path].stopcontact = nw;
+      var valEl = document.getElementById(target + '-val');
+      var prEl  = document.getElementById(target + '-price');
+      if (valEl) valEl.textContent = nw;
+      if (prEl && PRICES) prEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk * nw);
+      updateOfferte();
+    });
+  });
+
+  // ── Extra groepen (aanp) ──
+  document.getElementById('aanp-groepen-min').addEventListener('click', function() {
+    if (state.aanp.extraGroepen <= 0) return;
+    state.aanp.extraGroepen--;
+    document.getElementById('aanp-groepen-val').textContent = state.aanp.extraGroepen;
+    updateAanpHint();
+    updateOfferte();
+  });
+  document.getElementById('aanp-groepen-plus').addEventListener('click', function() {
+    if (state.aanp.extraGroepen >= 20) return;
+    state.aanp.extraGroepen++;
+    document.getElementById('aanp-groepen-val').textContent = state.aanp.extraGroepen;
+    updateAanpHint();
+    updateOfferte();
+  });
+
+  // ── "Kies datum" knop ──
+  document.getElementById('ob-to-booking').addEventListener('click', function() {
+    if (!hasSelection()) return;
+    var bookingEl = document.getElementById('booking');
+    bookingEl.style.display = '';
+    bookingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!state.calLoaded) { state.calLoaded = true; initKalender(); }
+    // Toon postcode bar
+    document.getElementById('ob-postcode-bar').style.display = '';
+  });
+}
+
+function updateAanpHint() {
+  var n    = state.aanp.extraGroepen;
+  var hint = document.getElementById('aanp-groepen-hint');
+  if (!hint || !PRICES) return;
+  if (n === 0) { hint.textContent = ''; return; }
+  var p = PRICES.aanp.extra_groep_eerste + Math.max(0, n - 1) * PRICES.aanp.extra_groep_extra;
+  hint.textContent = fmtP(p) + (n === 1
+    ? ' (1e groep)'
+    : ' (1e \u20ac' + PRICES.aanp.extra_groep_eerste + ' + ' + (n-1) + '\u00d7\u20ac' + PRICES.aanp.extra_groep_extra + ')');
+}
+
+/* ─── Postcode ───────────────────────────────────────────── */
 function initPostcode() {
-  const btn = document.getElementById('postcode-btn');
-  const input = document.getElementById('postcode-input');
+  var btn   = document.getElementById('postcode-btn');
+  var input = document.getElementById('postcode-input');
+  if (!btn) return;
   btn.addEventListener('click', checkPostcode);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') checkPostcode(); });
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); checkPostcode(); }
+  });
 }
 
-async function checkPostcode() {
-  const input = document.getElementById('postcode-input');
-  const result = document.getElementById('postcode-result');
-  const raw = input.value.replace(/\s/g, '').toUpperCase();
+function checkPostcode() {
+  var input  = document.getElementById('postcode-input');
+  var result = document.getElementById('postcode-result');
+  var raw    = input.value.replace(/\s/g,'').toUpperCase();
 
-  // Dutch postcode: 4 digits + 2 letters
   if (!/^\d{4}[A-Z]{2}$/.test(raw)) {
     result.className = 'postcode-result error';
     result.textContent = 'Voer een geldige postcode in (bijv. 3141 AP)';
@@ -166,452 +371,346 @@ async function checkPostcode() {
   }
 
   result.className = 'postcode-result';
-  result.textContent = 'Postcode controleren…';
+  result.textContent = 'Controleren\u2026';
 
-  try {
-    // Geocode via Nominatim (OSM) — free, no API key needed
-    const query = `${raw.slice(0, 4)} ${raw.slice(4)}`;
-    const url = `https://nominatim.openstreetmap.org/search?postalcode=${encodeURIComponent(query)}&country=NL&format=json&limit=1`;
-    const geo = await fetch(url, { headers: { 'Accept-Language': 'nl' } }).then(r => r.json());
-
+  var query = raw.slice(0,4) + ' ' + raw.slice(4);
+  fetch('https://nominatim.openstreetmap.org/search?postalcode=' + encodeURIComponent(query) + '&country=NL&format=json&limit=1',
+    { headers: { 'Accept-Language': 'nl' } }
+  ).then(function(r){ return r.json(); }).then(function(geo) {
     if (!geo.length) {
       result.className = 'postcode-result error';
-      result.textContent = 'Postcode niet gevonden. Controleer en probeer opnieuw.';
+      result.textContent = 'Postcode niet gevonden.';
       return;
     }
-
-    const lat = parseFloat(geo[0].lat);
-    const lon = parseFloat(geo[0].lon);
-
-    // Calculate distance on server
-    const distRes = await fetch(`${API}/distance`, {
+    return fetch(API + '/distance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lat, lon }),
-    }).then(r => r.json());
-
-    state.distanceKm = distRes.distance_km;
-    state.surchargeEur = distRes.surcharge_eur;
-    state.distanceLat = lat;
-    state.distanceLon = lon;
-    state.postcodeValid = true;
-
-    if (distRes.within_free_zone) {
-      result.className = 'postcode-result ok';
-      result.textContent = `✓ Binnen rijbereik (${distRes.distance_km} km) — geen reistoeslag`;
-    } else {
-      result.className = 'postcode-result ok-surcharge';
-      result.textContent = `${distRes.distance_km} km — reistoeslag +€${fmtPrice(distRes.surcharge_eur)} (${distRes.surcharge_km} km × €0,40)`;
-    }
-
-    renderPriceTotals();
-
-  } catch (err) {
+      body: JSON.stringify({ lat: parseFloat(geo[0].lat), lon: parseFloat(geo[0].lon) }),
+    }).then(function(r){ return r.json(); }).then(function(d) {
+      state.distanceKm   = d.distance_km;
+      state.surchargeEur = d.surcharge_eur;
+      state.postcodeRaw  = raw;
+      if (d.within_free_zone) {
+        result.className = 'postcode-result ok';
+        result.textContent = '\u2713 Binnen rijbereik (' + d.distance_km + ' km) \u2014 geen reistoeslag';
+      } else {
+        result.className = 'postcode-result ok-surcharge';
+        result.textContent = d.distance_km + ' km \u2014 reistoeslag ' + fmtP(d.surcharge_eur);
+      }
+      updateOfferte();
+    });
+  }).catch(function() {
     result.className = 'postcode-result error';
-    result.textContent = 'Kon postcode niet controleren. Probeer het opnieuw.';
-    console.error('Postcode check error:', err);
-  }
+    result.textContent = 'Kon postcode niet controleren. Probeer opnieuw.';
+  });
 }
 
-// ═══════════════════════════════════════════════════════════
-// 4. CALENDAR
-// ═══════════════════════════════════════════════════════════
+/* ─── Kalender ───────────────────────────────────────────── */
+function initKalender() {
+  var now = new Date();
+  state.calYear  = now.getFullYear();
+  state.calMonth = now.getMonth() + 1;
 
-function initCalendar() {
-  const now = new Date();
-  state.calYear = now.getFullYear();
-  state.calMonth = now.getMonth() + 1; // 1-based
-
-  document.getElementById('cal-prev').addEventListener('click', () => {
-    const now2 = new Date();
-    if (state.calYear === now2.getFullYear() && state.calMonth === now2.getMonth() + 1) return; // Don't go to past
+  document.getElementById('cal-prev').addEventListener('click', function() {
+    var now2 = new Date();
+    if (state.calYear === now2.getFullYear() && state.calMonth === now2.getMonth()+1) return;
     state.calMonth--;
     if (state.calMonth < 1) { state.calMonth = 12; state.calYear--; }
-    loadAndRenderCalendar();
+    laadKalender();
   });
-
-  document.getElementById('cal-next').addEventListener('click', () => {
+  document.getElementById('cal-next').addEventListener('click', function() {
     state.calMonth++;
     if (state.calMonth > 12) { state.calMonth = 1; state.calYear++; }
-    loadAndRenderCalendar();
+    laadKalender();
   });
-
-  loadAndRenderCalendar();
+  laadKalender();
 }
 
-async function loadAndRenderCalendar() {
-  const monthStr = `${state.calYear}-${String(state.calMonth).padStart(2, '0')}`;
+function laadKalender() {
+  var m = state.calYear + '-' + String(state.calMonth).padStart(2,'0');
   document.getElementById('cal-loading').classList.remove('hidden');
-  document.getElementById('calendar-grid').style.opacity = '.4';
-
-  try {
-    const data = await fetch(`${API}/availability?month=${monthStr}`).then(r => r.json());
-    state.availability = data;
-  } catch {
-    state.availability = {};
-  }
-
-  document.getElementById('cal-loading').classList.add('hidden');
-  document.getElementById('calendar-grid').style.opacity = '1';
-  renderCalendar();
+  document.getElementById('calendar-grid').style.opacity = '.3';
+  fetch(API + '/availability?month=' + m)
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      state.availability = d;
+      document.getElementById('cal-loading').classList.add('hidden');
+      document.getElementById('calendar-grid').style.opacity = '1';
+      renderKalender();
+    })
+    .catch(function() {
+      state.availability = {};
+      document.getElementById('cal-loading').classList.add('hidden');
+      document.getElementById('calendar-grid').style.opacity = '1';
+      renderKalender();
+    });
 }
 
-function renderCalendar() {
-  const monthStr = `${state.calYear}-${String(state.calMonth).padStart(2, '0')}`;
-  const monthLabel = new Date(state.calYear, state.calMonth - 1, 1)
-    .toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' });
-  document.getElementById('cal-month-label').textContent = monthLabel;
+function renderKalender() {
+  document.getElementById('cal-month-label').textContent =
+    new Date(state.calYear, state.calMonth-1, 1)
+      .toLocaleDateString('nl-NL', { month:'long', year:'numeric' });
 
-  const grid = document.getElementById('calendar-grid');
+  var grid = document.getElementById('calendar-grid');
   grid.innerHTML = '';
 
-  // Weekday headers (Ma Di Wo Do Vr Za Zo)
-  ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].forEach(d => {
-    const h = document.createElement('div');
+  ['Ma','Di','Wo','Do','Vr','Za','Zo'].forEach(function(d) {
+    var h = document.createElement('div');
     h.className = 'cal-weekday-header';
     h.textContent = d;
     grid.appendChild(h);
   });
 
-  // First day of month — what weekday is it? (0=Sun, 1=Mon, …)
-  const firstDay = new Date(state.calYear, state.calMonth - 1, 1).getDay();
-  // Adjust so Monday = 0
-  const offset = (firstDay === 0) ? 6 : firstDay - 1;
-
-  // Leading empty cells
-  for (let i = 0; i < offset; i++) {
-    const empty = document.createElement('div');
-    empty.className = 'cal-day other-month';
-    grid.appendChild(empty);
+  var firstDay = new Date(state.calYear, state.calMonth-1, 1).getDay();
+  var offset   = firstDay === 0 ? 6 : firstDay - 1;
+  for (var i = 0; i < offset; i++) {
+    var e = document.createElement('div');
+    e.className = 'cal-day other-month';
+    grid.appendChild(e);
   }
 
-  const daysInMonth = new Date(state.calYear, state.calMonth, 0).getDate();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  var days  = new Date(state.calYear, state.calMonth, 0).getDate();
+  var today = new Date(); today.setHours(0,0,0,0);
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${state.calYear}-${String(state.calMonth).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const dayDate = new Date(dateStr + 'T12:00:00Z');
-    const dayOfWeek = dayDate.getUTCDay(); // 0=Sun, 6=Sat
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-    const isPast = dayDate < today;
+  for (var d = 1; d <= days; d++) {
+    var ds  = state.calYear + '-' + String(state.calMonth).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    var dd  = new Date(ds + 'T12:00:00Z');
+    var dow = dd.getUTCDay();
 
-    const cell = document.createElement('div');
+    var cell = document.createElement('div');
     cell.className = 'cal-day';
-    if (isWeekend) cell.classList.add('weekend');
-    if (isPast) cell.classList.add('past');
+    if (dow === 0 || dow === 6) cell.classList.add('weekend');
+    if (dd < today)             cell.classList.add('past');
 
-    const numEl = document.createElement('div');
+    var numEl = document.createElement('div');
     numEl.className = 'cal-day-num';
     numEl.textContent = d;
     cell.appendChild(numEl);
 
-    if (!isWeekend && !isPast) {
-      const avail = state.availability[dateStr];
-      const slotsEl = document.createElement('div');
+    if (!(dow === 0 || dow === 6) && !(dd < today)) {
+      var avail   = state.availability[ds];
+      var slotsEl = document.createElement('div');
       slotsEl.className = 'cal-slots';
 
-      ['am', 'pm'].forEach(slot => {
-        const slotEl = document.createElement('div');
-        const isAvail = avail ? avail[slot] : false;
-        const isSelected = state.selectedDate === dateStr && state.selectedSlot === slot;
-        const label = slot === 'am' ? '09–13' : '13–17';
-
-        slotEl.className = `cal-slot ${isSelected ? 'selected' : (isAvail ? 'available' : 'full')}`;
-        slotEl.textContent = label;
-        slotEl.title = isAvail ? `${dateStr} — ${slot === 'am' ? '09:00–13:00' : '13:00–17:00'} (beschikbaar)` : 'Volgeboekt';
+      ['am','pm'].forEach(function(slot) {
+        var isAvail    = avail ? avail[slot] : false;
+        var isSelected = state.selectedDate === ds && state.selectedSlot === slot;
+        var slotEl     = document.createElement('div');
+        slotEl.className = 'cal-slot ' + (isSelected ? 'selected' : (isAvail ? 'available' : 'full'));
+        slotEl.textContent = slot === 'am' ? '09\u201313' : '13\u201317';
 
         if (isAvail && !isSelected) {
-          slotEl.addEventListener('click', () => selectSlot(dateStr, slot));
+          (function(d2, s2) {
+            slotEl.addEventListener('click', function() {
+              state.selectedDate = d2;
+              state.selectedSlot = s2;
+              renderKalender();
+              toonFormulier();
+            });
+          })(ds, slot);
         } else if (isSelected) {
-          slotEl.addEventListener('click', () => deselectSlot());
+          slotEl.addEventListener('click', function() {
+            state.selectedDate = null;
+            state.selectedSlot = null;
+            renderKalender();
+            document.getElementById('booking-form-wrap').style.display = 'none';
+          });
         }
-
         slotsEl.appendChild(slotEl);
       });
-
       cell.appendChild(slotsEl);
     }
-
     grid.appendChild(cell);
   }
 }
 
-function selectSlot(date, slot) {
-  state.selectedDate = date;
-  state.selectedSlot = slot;
-  renderCalendar();
-  showBookingForm(date, slot);
-}
+function toonFormulier() {
+  var wrap  = document.getElementById('booking-form-wrap');
+  var label = document.getElementById('selected-slot-label');
+  if (!state.selectedDate || !state.selectedSlot) { wrap.style.display = 'none'; return; }
 
-function deselectSlot() {
-  state.selectedDate = null;
-  state.selectedSlot = null;
-  renderCalendar();
-  document.getElementById('booking-form-wrap').style.display = 'none';
-}
+  var d = new Date(state.selectedDate + 'T12:00:00Z')
+    .toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:'UTC' });
+  var t = state.selectedSlot === 'am' ? '09:00 \u2013 13:00' : '13:00 \u2013 17:00';
+  label.textContent = d + ' \u00b7 ' + t;
 
-// ═══════════════════════════════════════════════════════════
-// 5. BOOKING FORM
-// ═══════════════════════════════════════════════════════════
+  // Vul samenvatting in
+  var lines = getLines();
+  var total = getTotal();
+  var summaryEl = document.getElementById('form-summary');
+  summaryEl.innerHTML =
+    '<div class="form-summary-label">Samenvatting</div>' +
+    lines.map(function(l) {
+      var name = l.qty && l.qty > 1 ? esc(l.name) + ' (\u00d7' + l.qty + ')' : esc(l.name);
+      return '<div class="form-summary-row"><span>' + name + '</span><span>' + fmtP(l.price) + '</span></div>';
+    }).join('') +
+    (state.surchargeEur > 0
+      ? '<div class="form-summary-row"><span>Reistoeslag</span><span>' + fmtP(state.surchargeEur) + '</span></div>'
+      : '') +
+    '<div class="form-summary-row form-summary-total"><span>Totaal excl. BTW</span><span>' + fmtP(total) + '</span></div>';
 
-function initBookingForm() {
-  document.getElementById('go-to-book-btn').addEventListener('click', () => {
-    const bookingSection = document.getElementById('booking');
-    bookingSection.style.display = '';
-    bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  document.getElementById('booking-form').addEventListener('submit', submitBooking);
-}
-
-function showBookingForm(date, slot) {
-  const wrap = document.getElementById('booking-form-wrap');
   wrap.style.display = '';
-
-  const dayLabel = new Date(date + 'T12:00:00Z').toLocaleDateString('nl-NL', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'
-  });
-  const slotLabel = slot === 'am' ? '09:00 – 13:00' : '13:00 – 17:00';
-  document.getElementById('selected-slot-label').textContent = `📅 ${dayLabel} · ${slotLabel}`;
-
-  // Fill form summary
-  const items = getSelectedItems();
-  const total = state.subtotal + state.surchargeEur;
-  const summaryEl = document.getElementById('form-summary-services');
-  summaryEl.innerHTML = items.map(i => `<div>• ${escHtml(i.name)} — €${fmtPrice(i.price)}</div>`).join('');
-  if (state.surchargeEur > 0) {
-    summaryEl.innerHTML += `<div>• Reistoeslag (${Math.round(state.distanceKm - 20)} km × €0,40) — €${fmtPrice(state.surchargeEur)}</div>`;
-  }
-  document.getElementById('form-summary-total').textContent = `Totaal: € ${fmtPrice(total)}`;
-
   wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-async function submitBooking(e) {
-  e.preventDefault();
+/* ─── Formulier ──────────────────────────────────────────── */
+function initFormulier() {
+  document.getElementById('booking-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form    = e.target;
+    var btn     = document.getElementById('book-submit-btn');
+    var name    = form.name.value.trim();
+    var email   = form.email.value.trim();
+    var address = form.address.value.trim();
 
-  const form = e.target;
-  const btn = document.getElementById('book-submit-btn');
+    [form.name, form.email, form.address].forEach(function(f){ f.classList.remove('error'); });
+    var valid = true;
+    if (!name)                       { form.name.classList.add('error');    valid = false; }
+    if (!email || !email.includes('@')) { form.email.classList.add('error'); valid = false; }
+    if (!address)                    { form.address.classList.add('error'); valid = false; }
+    if (!valid) return;
 
-  // Validate required fields
-  const name = form.name.value.trim();
-  const email = form.email.value.trim();
-  const phone = form.phone.value.trim();
-  const address = form.address.value.trim();
+    if (!state.selectedDate || !state.selectedSlot) {
+      alert('Selecteer eerst een datum en tijdslot in de agenda.');
+      return;
+    }
 
-  let valid = true;
-  [form.name, form.email, form.phone, form.address].forEach(f => f.classList.remove('error'));
+    btn.disabled = true;
+    btn.textContent = 'Versturen\u2026';
 
-  if (!name) { form.name.classList.add('error'); valid = false; }
-  if (!email || !email.includes('@')) { form.email.classList.add('error'); valid = false; }
-  if (!phone) { form.phone.classList.add('error'); valid = false; }
-  if (!address) { form.address.classList.add('error'); valid = false; }
-
-  if (!state.selectedDate || !state.selectedSlot) {
-    alert('Selecteer eerst een datum en tijdsblok in de agenda.');
-    return;
-  }
-  if (!valid) {
-    alert('Vul alle verplichte velden in (gemarkeerd met *)');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Bezig met inplannen…';
-
-  const items = getSelectedItems();
-  const postcode = document.getElementById('postcode-input').value.trim();
-
-  try {
-    const res = await fetch(`${API}/bookings`, {
+    var lines = getLines();
+    fetch(API + '/bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        date: state.selectedDate,
-        slot: state.selectedSlot,
-        customer: { name, email, phone, postcode, address },
-        services: items.map(i => ({ name: i.name, price: i.price })),
-        total: state.subtotal + state.surchargeEur,
-        distance_km: state.distanceKm,
-        surcharge_eur: state.surchargeEur,
+        date: state.selectedDate, slot: state.selectedSlot,
+        customer: { name: name, email: email, postcode: state.postcodeRaw || '', address: address },
+        services: lines.map(function(l){ return { name: l.name, price: l.price }; }),
+        total: getTotal(),
+        distance_km: state.distanceKm, surcharge_eur: state.surchargeEur,
         notes: form.notes.value.trim(),
       }),
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      showSuccess(data.message);
-    } else {
-      alert(data.error || 'Er is een fout opgetreden. Probeer het opnieuw.');
+    }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+    .then(function(res) {
+      if (res.ok) {
+        document.getElementById('offerte').style.display = 'none';
+        document.getElementById('booking').style.display = 'none';
+        var s = document.getElementById('booking-success');
+        s.style.display = '';
+        document.getElementById('success-message').textContent = res.data.message;
+        s.scrollIntoView({ behavior:'smooth', block:'start' });
+      } else {
+        alert(res.data.error || 'Er is een fout opgetreden. Probeer opnieuw.');
+        btn.disabled = false;
+        btn.textContent = 'Afspraak bevestigen \u2713';
+      }
+    }).catch(function() {
+      alert('Verbindingsfout. Controleer uw internetverbinding en probeer opnieuw.');
       btn.disabled = false;
-      btn.textContent = 'Afspraak Bevestigen';
-    }
-  } catch {
-    alert('Verbindingsfout. Controleer uw internetverbinding en probeer opnieuw.');
-    btn.disabled = false;
-    btn.textContent = 'Afspraak Bevestigen';
-  }
+      btn.textContent = 'Afspraak bevestigen \u2713';
+    });
+  });
 }
 
-function showSuccess(message) {
-  document.getElementById('booking').style.display = 'none';
-  const successSection = document.getElementById('booking-success');
-  successSection.style.display = '';
-  document.getElementById('success-message').textContent = message;
-  successSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+/* ─── Prices laden ───────────────────────────────────────── */
+function laadPrijzen() {
+  return fetch(API + '/prices')
+    .then(function(r){ return r.json(); })
+    .then(function(p) {
+      PRICES = p;
+      state.nieuw.groependPrice = p.nieuw.groepen_10;
+      vulPrijsLabels();
+      updateOfferte();
+    })
+    .catch(function(e){ console.error('Prijzen laden mislukt:', e); });
 }
 
-// ═══════════════════════════════════════════════════════════
-// 6. CONTENT LOADER (CMS)
-// ═══════════════════════════════════════════════════════════
-
-async function loadContent() {
-  try {
-    const content = await fetch(`${API}/content`).then(r => r.json());
-    state.content = content;
-
-    // Meta / SEO
-    if (content.meta?.title) document.title = content.meta.title;
-    if (content.meta?.description) {
-      document.querySelector('meta[name="description"]')?.setAttribute('content', content.meta.description);
-    }
-
-    // Contact info — update throughout page
-    const phone = content.contact?.phone;
-    const email = content.contact?.email;
-    if (phone) {
-      const tel = phone.replace(/-/g, '');
-      document.querySelectorAll('[id$="phone"], [id$="phone-num"]').forEach(el => {
-        el.textContent = phone;
-        if (el.tagName === 'A' || el.closest('a')) {
-          const link = el.closest('a') || el;
-          link.href = `tel:${tel}`;
-        }
-      });
-      document.querySelectorAll('a[href^="tel:"]').forEach(a => { a.href = `tel:${tel}`; });
-      document.querySelectorAll('#success-phone').forEach(el => { el.textContent = phone; });
-      document.querySelectorAll('#success-phone-link').forEach(el => { el.href = `tel:${tel}`; });
-    }
-    if (email) {
-      document.querySelectorAll('#footer-email').forEach(el => {
-        el.textContent = email;
-        el.href = `mailto:${email}`;
-      });
-    }
-    if (content.contact?.kvk) {
-      document.getElementById('footer-kvk').textContent = `KVK: ${content.contact.kvk}`;
-    }
-    if (content.contact?.btw) {
-      document.getElementById('footer-btw').textContent = `BTW: ${content.contact.btw}`;
-    }
-
-    // FAQ
-    if (content.faq?.length) renderFAQ(content.faq);
-
-    // SEO content blocks
-    if (content.seo_content?.blocks?.length) renderSEOBlocks(content.seo_content.blocks);
-
-  } catch (err) {
-    console.error('Content load error:', err);
-  }
+/* ─── Content (CMS) ──────────────────────────────────────── */
+function laadContent() {
+  fetch(API + '/content')
+    .then(function(r){ return r.json(); })
+    .then(function(c) {
+      state.content = c;
+      if (c.meta && c.meta.title) document.title = c.meta.title;
+      if (c.meta && c.meta.description) {
+        var m = document.querySelector('meta[name="description"]');
+        if (m) m.setAttribute('content', c.meta.description);
+      }
+      if (c.contact && c.contact.email) {
+        var el = document.getElementById('footer-email');
+        if (el) { el.textContent = c.contact.email; el.href = 'mailto:' + c.contact.email; }
+      }
+      if (c.contact && c.contact.kvk) {
+        var k = document.getElementById('footer-kvk');
+        if (k) k.textContent = 'KVK: ' + c.contact.kvk;
+      }
+      if (c.contact && c.contact.btw) {
+        var b = document.getElementById('footer-btw');
+        if (b) b.textContent = 'BTW: ' + c.contact.btw;
+      }
+      if (c.faq && c.faq.length) renderFAQ(c.faq);
+      if (c.seo_content && c.seo_content.blocks) renderSEO(c.seo_content.blocks);
+    })
+    .catch(function(e){ console.error('Content error:', e); });
 }
 
-// ═══════════════════════════════════════════════════════════
-// 7. FAQ
-// ═══════════════════════════════════════════════════════════
+function renderFAQ(items) {
+  var list = document.getElementById('faq-list');
+  list.innerHTML = items.map(function(item, i) {
+    return '<div class="faq-item">' +
+      '<div class="faq-q" data-idx="' + i + '" role="button" tabindex="0">' +
+      esc(item.question) + '<span class="faq-icon">+</span></div>' +
+      '<div class="faq-a" id="faq-a-' + i + '">' + esc(item.answer) + '</div></div>';
+  }).join('');
 
-function renderFAQ(faqItems) {
-  const list = document.getElementById('faq-list');
-  list.innerHTML = faqItems.map((item, i) => `
-    <div class="faq-item">
-      <div class="faq-q" data-idx="${i}" role="button" tabindex="0" aria-expanded="false">
-        ${escHtml(item.question)}
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-a" id="faq-a-${i}">${escHtml(item.answer)}</div>
-    </div>
-  `).join('');
-
-  list.querySelectorAll('.faq-q').forEach(q => {
-    const toggle = () => {
-      const idx = q.dataset.idx;
-      const answer = document.getElementById(`faq-a-${idx}`);
-      const isOpen = q.classList.contains('open');
-      // Close all
-      list.querySelectorAll('.faq-q').forEach(el => el.classList.remove('open'));
-      list.querySelectorAll('.faq-a').forEach(el => el.classList.remove('open'));
-      if (!isOpen) { q.classList.add('open'); answer.classList.add('open'); }
+  list.querySelectorAll('.faq-q').forEach(function(q) {
+    var toggle = function() {
+      var a    = document.getElementById('faq-a-' + q.dataset.idx);
+      var open = q.classList.contains('open');
+      list.querySelectorAll('.faq-q').forEach(function(el){ el.classList.remove('open'); });
+      list.querySelectorAll('.faq-a').forEach(function(el){ el.classList.remove('open'); });
+      if (!open) { q.classList.add('open'); a.classList.add('open'); }
     };
     q.addEventListener('click', toggle);
-    q.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    q.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
   });
 
-  // FAQ Schema.org
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    'mainEntity': faqItems.map(item => ({
-      '@type': 'Question',
-      'name': item.question,
-      'acceptedAnswer': { '@type': 'Answer', 'text': item.answer },
-    })),
-  };
-  document.getElementById('faq-schema').textContent = JSON.stringify(schema);
+  var schema = document.getElementById('faq-schema');
+  if (schema) schema.textContent = JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: items.map(function(item) {
+      return { '@type': 'Question', name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer } };
+    }),
+  });
 }
 
-function renderSEOBlocks(blocks) {
-  const container = document.getElementById('seo-blocks');
-  container.innerHTML = blocks.map(b => `
-    <div class="seo-block">
-      <h3>${escHtml(b.heading)}</h3>
-      <p>${escHtml(b.text)}</p>
-    </div>
-  `).join('');
+function renderSEO(blocks) {
+  var c = document.getElementById('seo-blocks');
+  if (!c || !blocks) return;
+  c.innerHTML = blocks.map(function(b) {
+    return '<div class="seo-block"><h3>' + esc(b.heading) + '</h3><p>' + esc(b.text) + '</p></div>';
+  }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════
-// 8. UTILITIES
-// ═══════════════════════════════════════════════════════════
+/* ─── Init ───────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  var yr = document.getElementById('footer-year');
+  if (yr) yr.textContent = new Date().getFullYear();
 
-function fmtPrice(n) {
-  return n.toLocaleString('nl-NL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-}
+  laadContent();
+  laadPrijzen().then(function() {
+    initOB();
+    initPostcode();
+    initFormulier();
+  });
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// ═══════════════════════════════════════════════════════════
-// 9. INIT
-// ═══════════════════════════════════════════════════════════
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Footer year
-  document.getElementById('footer-year').textContent = new Date().getFullYear();
-
-  // Load CMS content first (non-blocking)
-  loadContent();
-
-  // Init modules
-  initCalculator();
-  initPostcode();
-  initCalendar();
-  initBookingForm();
-
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
     });
   });
 });

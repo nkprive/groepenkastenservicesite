@@ -77,6 +77,7 @@ function showPage(page) {
   if (page === 'availability') loadAvailability();
   if (page === 'bookings') loadBookings();
   if (page === 'content') loadContent();
+  if (page === 'prices') loadPrices();
 }
 
 // ─────────────────────────────────────────────
@@ -492,4 +493,54 @@ function showToast(msg, type = '') {
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 3000);
+}
+
+/* ─── Prijzen ─────────────────────────────────────────────── */
+async function loadPrices() {
+  try {
+    const p = await apiFetch('/api/admin/prices');
+    // Fill nieuw
+    for (const [key, val] of Object.entries(p.nieuw || {})) {
+      const el = document.getElementById('p-nieuw-' + key);
+      if (el) el.value = val;
+    }
+    // Fill aanp
+    for (const [key, val] of Object.entries(p.aanp || {})) {
+      const el = document.getElementById('p-aanp-' + key);
+      if (el) el.value = val;
+    }
+  } catch (e) {
+    console.error('Prijzen laden mislukt:', e);
+  }
+}
+
+async function savePrices() {
+  const statusEl = document.getElementById('prices-status');
+  statusEl.textContent = 'Opslaan…';
+  statusEl.style.color = 'var(--gray-400)';
+
+  const nieuwKeys = ['fase_1','fase_3','groepen_8','groepen_10','groepen_12','groepen_per_stuk',
+    'kookgroep','conn_1fase','conn_3fase','beltrafo','overspanning','stopcontact_per_stuk'];
+  const aanpKeys  = ['naar_3fase','extra_groep_eerste','extra_groep_extra','kookgroep',
+    'conn_1fase','conn_3fase','beltrafo','overspanning','stopcontact_per_stuk'];
+
+  const body = { nieuw: {}, aanp: {} };
+  for (const k of nieuwKeys) {
+    const el = document.getElementById('p-nieuw-' + k);
+    if (el) body.nieuw[k] = Number(el.value);
+  }
+  for (const k of aanpKeys) {
+    const el = document.getElementById('p-aanp-' + k);
+    if (el) body.aanp[k] = Number(el.value);
+  }
+
+  try {
+    await apiFetch('/api/admin/prices', { method: 'PUT', body: JSON.stringify(body) });
+    statusEl.textContent = '✓ Opgeslagen';
+    statusEl.style.color = 'var(--green)';
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+  } catch (e) {
+    statusEl.textContent = 'Fout: ' + e.message;
+    statusEl.style.color = 'var(--red)';
+  }
 }
