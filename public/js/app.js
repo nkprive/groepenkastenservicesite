@@ -219,43 +219,56 @@ function initOB() {
     });
   });
 
-  // Toggle rijen: naar3fase, beltrafo, overspanning
-  ['naar3fase', 'beltrafo', 'overspanning'].forEach(function(id) {
-    document.querySelectorAll('.ob-toggle-row[data-id="' + id + '"]').forEach(function(row) {
-      var path    = row.dataset.path;
-      var input   = row.querySelector('.ob-sw-input');
-      var priceEl = row.querySelector('.ob-toggle-price');
-      input.addEventListener('change', function() {
-        if (id === 'naar3fase') state.aanp.naar3fase = input.checked;
-        else state[path][id] = input.checked;
-        if (priceEl) priceEl.classList.toggle('hidden', !input.checked);
-        updateOfferte();
-      });
+  // Toggle rijen: naar3fase
+  document.querySelectorAll('.ob-toggle-row[data-id="naar3fase"]').forEach(function(row) {
+    var input   = row.querySelector('.ob-sw-input');
+    var priceEl = row.querySelector('.ob-toggle-price');
+    input.addEventListener('change', function() {
+      state.aanp.naar3fase = input.checked;
+      if (priceEl) priceEl.classList.toggle('hidden', !input.checked);
+      updateOfferte();
     });
   });
 
-  // Toggle rijen: stopcontact (toggle + qty)
-  document.querySelectorAll('.ob-toggle-row[data-id="stopcontact"]').forEach(function(row) {
-    var path    = row.dataset.path;
-    var input   = row.querySelector('.ob-sw-input');
-    var priceEl = row.querySelector('.ob-toggle-price');
-    var opts    = document.getElementById(path + '-stopcontact-opts');
-    input.addEventListener('change', function() {
-      if (input.checked) {
+  // Checkboxen: beltrafo, overspanning
+  document.querySelectorAll('.ob-check-row[data-path][data-id]').forEach(function(row) {
+    var path = row.dataset.path;
+    var id   = row.dataset.id;
+    if (id === 'stopcontact') return;
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.ob-qty-ctrl')) return;
+      var checked = row.classList.toggle('selected');
+      row.setAttribute('aria-checked', checked ? 'true' : 'false');
+      state[path][id] = checked;
+      updateOfferte();
+    });
+    row.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
+    });
+  });
+
+  // Stopcontact toggle + qty
+  document.querySelectorAll('.ob-check-row-qty[data-id="stopcontact"]').forEach(function(row) {
+    var path = row.dataset.path;
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.ob-qty-ctrl')) return;
+      var checked = row.classList.toggle('selected');
+      var qtyEl   = document.getElementById(path + '-stopcontact-qty');
+      if (checked) {
         state[path].stopcontact = 1;
-        if (opts) opts.classList.add('open');
-        if (priceEl && PRICES) {
-          priceEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk);
-          priceEl.classList.remove('hidden');
-        }
+        if (qtyEl) qtyEl.classList.remove('hidden');
       } else {
         state[path].stopcontact = 0;
-        if (opts) opts.classList.remove('open');
-        if (priceEl) priceEl.classList.add('hidden');
+        if (qtyEl) qtyEl.classList.add('hidden');
         var valEl = document.getElementById(path + '-stopcontact-val');
         if (valEl) valEl.textContent = '1';
+        var prEl = document.getElementById(path + '-stopcontact-price');
+        if (prEl && PRICES) prEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk);
       }
       updateOfferte();
+    });
+    row.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
     });
   });
 
