@@ -149,7 +149,7 @@
           <div class="ob-section ob-section-toggle">
             <div class="ob-toggle-row" data-path="nieuw" data-id="kookgroep">
               <span class="ob-toggle-icon">🍳</span>
-              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price" data-price-ref="nieuw.kookgroep"></em></span>
+              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price hidden" data-price-ref="nieuw.kookgroep"></em></span>
               <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
           </div>
@@ -214,27 +214,34 @@
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>➕</span> Extra's</div>
-            <div class="ob-check-row" data-path="nieuw" data-id="beltrafo">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Beltrafo</span>
-              <em class="ob-check-price" data-price-ref="nieuw.beltrafo"></em>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="nieuw" data-id="beltrafo">
+              <span class="ob-toggle-icon">🔔</span>
+              <span class="ob-toggle-title">Beltrafo <em class="ob-toggle-price hidden" data-price-ref="nieuw.beltrafo"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
-            <div class="ob-check-row" data-path="nieuw" data-id="overspanning">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Overspanningsbeveiliging</span>
-              <em class="ob-check-price" data-price-ref="nieuw.overspanning"></em>
+          </div>
+
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="nieuw" data-id="overspanning">
+              <span class="ob-toggle-icon">🛡️</span>
+              <span class="ob-toggle-title">Overspanningsbeveiliging <em class="ob-toggle-price hidden" data-price-ref="nieuw.overspanning"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
-            <div class="ob-check-row ob-check-row-qty" data-path="nieuw" data-id="stopcontact">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Extra stopcontact</span>
-              <div class="ob-qty-ctrl hidden" id="nieuw-stopcontact-qty">
+          </div>
+
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="nieuw" data-id="stopcontact">
+              <span class="ob-toggle-icon">🔌</span>
+              <span class="ob-toggle-title">Extra stopcontact <em class="ob-toggle-price hidden" id="nieuw-stopcontact-price"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="nieuw-stopcontact-opts">
+              <div class="ob-qty-ctrl" id="nieuw-stopcontact-qty">
                 <button type="button" class="ob-qty-btn" data-dir="-1" data-target="nieuw-stopcontact">−</button>
                 <span class="ob-qty-val" id="nieuw-stopcontact-val">1</span>
                 <button type="button" class="ob-qty-btn" data-dir="1" data-target="nieuw-stopcontact">+</button>
               </div>
-              <em class="ob-check-price" id="nieuw-stopcontact-price" data-price-ref="nieuw.stopcontact_per_stuk"></em>
             </div>
           </div>
 
@@ -243,12 +250,11 @@
         <!-- ══ PICKER: Aanpassing bestaande groepenkast ══ -->
         <div class="ob-picker hidden" id="picker-aanp">
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>⚡</span> Fase-uitbreiding</div>
-            <div class="ob-check-row" data-path="aanp" data-id="naar3fase">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">1-fase uitbreiden naar 3-fase</span>
-              <em class="ob-check-price" data-price-ref="aanp.naar_3fase"></em>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="aanp" data-id="naar3fase">
+              <span class="ob-toggle-icon">⚡</span>
+              <span class="ob-toggle-title">1-fase → 3-fase uitbreiding <em class="ob-toggle-price hidden" data-price-ref="aanp.naar_3fase"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
           </div>
 
@@ -268,7 +274,7 @@
           <div class="ob-section ob-section-toggle">
             <div class="ob-toggle-row" data-path="aanp" data-id="kookgroep">
               <span class="ob-toggle-icon">🍳</span>
-              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price" data-price-ref="aanp.kookgroep"></em></span>
+              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price hidden" data-price-ref="aanp.kookgroep"></em></span>
               <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
           </div>
@@ -333,27 +339,34 @@
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>➕</span> Extra's</div>
-            <div class="ob-check-row" data-path="aanp" data-id="beltrafo">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Beltrafo</span>
-              <em class="ob-check-price" data-price-ref="aanp.beltrafo"></em>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="aanp" data-id="beltrafo">
+              <span class="ob-toggle-icon">🔔</span>
+              <span class="ob-toggle-title">Beltrafo <em class="ob-toggle-price hidden" data-price-ref="aanp.beltrafo"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
-            <div class="ob-check-row" data-path="aanp" data-id="overspanning">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Overspanningsbeveiliging</span>
-              <em class="ob-check-price" data-price-ref="aanp.overspanning"></em>
+          </div>
+
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="aanp" data-id="overspanning">
+              <span class="ob-toggle-icon">🛡️</span>
+              <span class="ob-toggle-title">Overspanningsbeveiliging <em class="ob-toggle-price hidden" data-price-ref="aanp.overspanning"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
-            <div class="ob-check-row ob-check-row-qty" data-path="aanp" data-id="stopcontact">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Extra stopcontact</span>
-              <div class="ob-qty-ctrl hidden" id="aanp-stopcontact-qty">
+          </div>
+
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="aanp" data-id="stopcontact">
+              <span class="ob-toggle-icon">🔌</span>
+              <span class="ob-toggle-title">Extra stopcontact <em class="ob-toggle-price hidden" id="aanp-stopcontact-price"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="aanp-stopcontact-opts">
+              <div class="ob-qty-ctrl" id="aanp-stopcontact-qty">
                 <button type="button" class="ob-qty-btn" data-dir="-1" data-target="aanp-stopcontact">−</button>
                 <span class="ob-qty-val" id="aanp-stopcontact-val">1</span>
                 <button type="button" class="ob-qty-btn" data-dir="1" data-target="aanp-stopcontact">+</button>
               </div>
-              <em class="ob-check-price" id="aanp-stopcontact-price" data-price-ref="aanp.stopcontact_per_stuk"></em>
             </div>
           </div>
 

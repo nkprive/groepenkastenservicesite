@@ -209,10 +209,52 @@ function initOB() {
 
   // Toggle rijen: kookgroep (eenvoudig aan/uit)
   document.querySelectorAll('.ob-toggle-row[data-id="kookgroep"]').forEach(function(row) {
-    var path  = row.dataset.path;
-    var input = row.querySelector('.ob-sw-input');
+    var path    = row.dataset.path;
+    var input   = row.querySelector('.ob-sw-input');
+    var priceEl = row.querySelector('.ob-toggle-price');
     input.addEventListener('change', function() {
       state[path].kookgroep = input.checked;
+      if (priceEl) priceEl.classList.toggle('hidden', !input.checked);
+      updateOfferte();
+    });
+  });
+
+  // Toggle rijen: naar3fase, beltrafo, overspanning
+  ['naar3fase', 'beltrafo', 'overspanning'].forEach(function(id) {
+    document.querySelectorAll('.ob-toggle-row[data-id="' + id + '"]').forEach(function(row) {
+      var path    = row.dataset.path;
+      var input   = row.querySelector('.ob-sw-input');
+      var priceEl = row.querySelector('.ob-toggle-price');
+      input.addEventListener('change', function() {
+        if (id === 'naar3fase') state.aanp.naar3fase = input.checked;
+        else state[path][id] = input.checked;
+        if (priceEl) priceEl.classList.toggle('hidden', !input.checked);
+        updateOfferte();
+      });
+    });
+  });
+
+  // Toggle rijen: stopcontact (toggle + qty)
+  document.querySelectorAll('.ob-toggle-row[data-id="stopcontact"]').forEach(function(row) {
+    var path    = row.dataset.path;
+    var input   = row.querySelector('.ob-sw-input');
+    var priceEl = row.querySelector('.ob-toggle-price');
+    var opts    = document.getElementById(path + '-stopcontact-opts');
+    input.addEventListener('change', function() {
+      if (input.checked) {
+        state[path].stopcontact = 1;
+        if (opts) opts.classList.add('open');
+        if (priceEl && PRICES) {
+          priceEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk);
+          priceEl.classList.remove('hidden');
+        }
+      } else {
+        state[path].stopcontact = 0;
+        if (opts) opts.classList.remove('open');
+        if (priceEl) priceEl.classList.add('hidden');
+        var valEl = document.getElementById(path + '-stopcontact-val');
+        if (valEl) valEl.textContent = '1';
+      }
       updateOfferte();
     });
   });
@@ -253,49 +295,6 @@ function initOB() {
     });
   });
 
-  // Checkboxen: naar3fase, beltrafo, overspanning
-  document.querySelectorAll('.ob-check-row[data-path][data-id]').forEach(function(row) {
-    var path = row.dataset.path;
-    var id   = row.dataset.id;
-    if (id === 'stopcontact') return;
-    row.addEventListener('click', function(e) {
-      if (e.target.closest('.ob-qty-ctrl')) return;
-      var checked = row.classList.toggle('selected');
-      row.setAttribute('aria-checked', checked ? 'true' : 'false');
-      if (id === 'naar3fase') state.aanp.naar3fase = checked;
-      else state[path][id] = checked;
-      updateOfferte();
-    });
-    row.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
-    });
-  });
-
-  // Stopcontact toggle + qty
-  document.querySelectorAll('.ob-check-row-qty[data-id="stopcontact"]').forEach(function(row) {
-    var path = row.dataset.path;
-    row.addEventListener('click', function(e) {
-      if (e.target.closest('.ob-qty-ctrl')) return;
-      var checked = row.classList.toggle('selected');
-      var qtyEl   = document.getElementById(path + '-stopcontact-qty');
-      if (checked) {
-        state[path].stopcontact = 1;
-        if (qtyEl) qtyEl.classList.remove('hidden');
-      } else {
-        state[path].stopcontact = 0;
-        if (qtyEl) qtyEl.classList.add('hidden');
-        var valEl = document.getElementById(path + '-stopcontact-val');
-        if (valEl) valEl.textContent = '1';
-        var prEl = document.getElementById(path + '-stopcontact-price');
-        if (prEl && PRICES) prEl.textContent = '+ ' + fmtP(PRICES[path].stopcontact_per_stuk);
-      }
-      updateOfferte();
-    });
-    row.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); row.click(); }
-    });
-  });
-
   document.querySelectorAll('.ob-qty-btn[data-target]').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
@@ -329,8 +328,7 @@ function updateNieuwGroepenHint() {
   if (!hint || !PRICES) return;
   var n = state.nieuw.groepen;
   var p = PRICES.nieuw.groepen_eerste + Math.max(0, n - 1) * PRICES.nieuw.groepen_extra;
-  hint.textContent = fmtP(p) +
-    (n === 1 ? ' (1e groep)' : ' (1e \u20ac' + PRICES.nieuw.groepen_eerste + ' + ' + (n - 1) + '\u00d7\u20ac' + PRICES.nieuw.groepen_extra + ')');
+  hint.textContent = fmtP(p);
 }
 
 function updateAanpHint() {
@@ -339,8 +337,7 @@ function updateAanpHint() {
   var n = state.aanp.extraGroepen;
   if (n === 0) { hint.textContent = ''; return; }
   var p = PRICES.aanp.extra_groep_eerste + Math.max(0, n - 1) * PRICES.aanp.extra_groep_extra;
-  hint.textContent = fmtP(p) +
-    (n === 1 ? ' (1e groep)' : ' (1e \u20ac' + PRICES.aanp.extra_groep_eerste + ' + ' + (n - 1) + '\u00d7\u20ac' + PRICES.aanp.extra_groep_extra + ')');
+  hint.textContent = fmtP(p);
 }
 
 /* ─── Postcode ───────────────────────────────────────────── */

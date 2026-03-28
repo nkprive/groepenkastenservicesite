@@ -498,7 +498,7 @@ function showToast(msg, type = '') {
 /* ─── Prijzen ─────────────────────────────────────────────── */
 async function loadPrices() {
   try {
-    const p = await apiFetch('/api/admin/prices');
+    const p = await adminFetch('/api/admin/prices');
     // Fill nieuw
     for (const [key, val] of Object.entries(p.nieuw || {})) {
       const el = document.getElementById('p-nieuw-' + key);
@@ -519,7 +519,7 @@ async function savePrices() {
   statusEl.textContent = 'Opslaan…';
   statusEl.style.color = 'var(--gray-400)';
 
-  const nieuwKeys = ['fase_1','fase_3','groepen_8','groepen_10','groepen_12','groepen_per_stuk',
+  const nieuwKeys = ['fase_1','fase_3','groepen_eerste','groepen_extra',
     'kookgroep','conn_1fase','conn_3fase','beltrafo','overspanning','stopcontact_per_stuk'];
   const aanpKeys  = ['naar_3fase','extra_groep_eerste','extra_groep_extra','kookgroep',
     'conn_1fase','conn_3fase','beltrafo','overspanning','stopcontact_per_stuk'];
@@ -535,7 +535,7 @@ async function savePrices() {
   }
 
   try {
-    await apiFetch('/api/admin/prices', { method: 'PUT', body: JSON.stringify(body) });
+    await adminFetch('/api/admin/prices', { method: 'PUT', body });
     statusEl.textContent = '✓ Opgeslagen';
     statusEl.style.color = 'var(--green)';
     setTimeout(() => { statusEl.textContent = ''; }, 3000);
