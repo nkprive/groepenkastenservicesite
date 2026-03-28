@@ -124,71 +124,93 @@
           <div class="ob-section">
             <div class="ob-section-title"><span>⚡</span> Aansluitingsfase <span class="ob-required">verplicht</span></div>
             <div class="ob-btn-row" id="fase-row">
-              <button type="button" class="ob-opt-btn" data-key="fase" data-val="1fase" data-price-key="fase_1">
-                1-fase<span class="ob-opt-price" data-price-ref="nieuw.fase_1"></span>
+              <button type="button" class="ob-opt-btn" data-val="1fase">
+                1-fase <em class="ob-opt-price" data-price-ref="nieuw.fase_1"></em>
               </button>
-              <button type="button" class="ob-opt-btn" data-key="fase" data-val="3fase" data-price-key="fase_3">
-                3-fase<span class="ob-opt-price" data-price-ref="nieuw.fase_3"></span>
+              <button type="button" class="ob-opt-btn" data-val="3fase">
+                3-fase <em class="ob-opt-price" data-price-ref="nieuw.fase_3"></em>
               </button>
             </div>
           </div>
 
           <div class="ob-section">
             <div class="ob-section-title"><span>🔢</span> Aantal groepen</div>
-            <div class="ob-btn-row" id="groepen-row">
-              <button type="button" class="ob-opt-btn" data-key="groepen" data-val="8" data-price="0" data-price-key="groepen_8">
-                8<span class="ob-opt-price" data-price-ref="nieuw.groepen_8"></span>
-              </button>
-              <button type="button" class="ob-opt-btn selected" data-key="groepen" data-val="10" data-price="0" data-price-key="groepen_10">
-                10<span class="ob-opt-price" data-price-ref="nieuw.groepen_10"></span>
-              </button>
-              <button type="button" class="ob-opt-btn" data-key="groepen" data-val="12" data-price="0" data-price-key="groepen_12">
-                12<span class="ob-opt-price" data-price-ref="nieuw.groepen_12"></span>
-              </button>
-              <button type="button" class="ob-opt-btn" data-key="groepen" data-val="custom">
-                Eigen aantal
-              </button>
-            </div>
-            <div class="ob-custom-wrap hidden" id="groep-custom-wrap">
-              <input type="number" id="groep-custom-input" min="1" max="99" placeholder="Aantal groepen">
-              <span class="ob-custom-hint">× <span data-price-ref="nieuw.groepen_per_stuk"></span> per groep</span>
+            <div class="ob-groepen-ctrl">
+              <span class="ob-groepen-label">Aantal groepen</span>
+              <div class="ob-qty-ctrl ob-qty-standalone">
+                <button type="button" class="ob-qty-btn" id="nieuw-groepen-min">−</button>
+                <span class="ob-qty-val" id="nieuw-groepen-val">10</span>
+                <button type="button" class="ob-qty-btn" id="nieuw-groepen-plus">+</button>
+              </div>
+              <span class="ob-groepen-hint" id="nieuw-groepen-hint"></span>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🍳</span> Kookgroep</div>
-            <div class="ob-check-row" data-path="nieuw" data-id="kookgroep">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Kookgroep toevoegen</span>
-              <span class="ob-check-sub">Voor inductiefornuis of elektrisch kooktoestel</span>
-              <span class="ob-check-price" data-price-ref="nieuw.kookgroep"></span>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="nieuw" data-id="kookgroep">
+              <span class="ob-toggle-icon">🍳</span>
+              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price" data-price-ref="nieuw.kookgroep"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🔋</span> Batterij aansluiting</div>
-            <div class="ob-btn-row" data-conn="batterij" data-path="nieuw">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="batterij" data-path="nieuw">
+              <span class="ob-toggle-icon">🔋</span>
+              <span class="ob-toggle-title">Batterij aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="nieuw-batterij-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🚗</span> Laadpaal aansluiting</div>
-            <div class="ob-btn-row" data-conn="laadpaal" data-path="nieuw">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="laadpaal" data-path="nieuw">
+              <span class="ob-toggle-icon">🚗</span>
+              <span class="ob-toggle-title">Laadpaal aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="nieuw-laadpaal-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>☀️</span> Zonnepanelen aansluiting</div>
-            <div class="ob-btn-row" data-conn="zonnepanelen" data-path="nieuw">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="nieuw.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="zonnepanelen" data-path="nieuw">
+              <span class="ob-toggle-icon">☀️</span>
+              <span class="ob-toggle-title">Zonnepanelen aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="nieuw-zonnepanelen-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="nieuw.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
@@ -197,12 +219,12 @@
             <div class="ob-check-row" data-path="nieuw" data-id="beltrafo">
               <div class="ob-check-box"></div>
               <span class="ob-check-label">Beltrafo</span>
-              <span class="ob-check-price" data-price-ref="nieuw.beltrafo"></span>
+              <em class="ob-check-price" data-price-ref="nieuw.beltrafo"></em>
             </div>
             <div class="ob-check-row" data-path="nieuw" data-id="overspanning">
               <div class="ob-check-box"></div>
               <span class="ob-check-label">Overspanningsbeveiliging</span>
-              <span class="ob-check-price" data-price-ref="nieuw.overspanning"></span>
+              <em class="ob-check-price" data-price-ref="nieuw.overspanning"></em>
             </div>
             <div class="ob-check-row ob-check-row-qty" data-path="nieuw" data-id="stopcontact">
               <div class="ob-check-box"></div>
@@ -212,7 +234,7 @@
                 <span class="ob-qty-val" id="nieuw-stopcontact-val">1</span>
                 <button type="button" class="ob-qty-btn" data-dir="1" data-target="nieuw-stopcontact">+</button>
               </div>
-              <span class="ob-check-price" id="nieuw-stopcontact-price" data-price-ref="nieuw.stopcontact_per_stuk"></span>
+              <em class="ob-check-price" id="nieuw-stopcontact-price" data-price-ref="nieuw.stopcontact_per_stuk"></em>
             </div>
           </div>
 
@@ -226,8 +248,7 @@
             <div class="ob-check-row" data-path="aanp" data-id="naar3fase">
               <div class="ob-check-box"></div>
               <span class="ob-check-label">1-fase uitbreiden naar 3-fase</span>
-              <span class="ob-check-sub">Meer capaciteit voor laadpalen, airco, inductie</span>
-              <span class="ob-check-price" data-price-ref="aanp.naar_3fase"></span>
+              <em class="ob-check-price" data-price-ref="aanp.naar_3fase"></em>
             </div>
           </div>
 
@@ -244,40 +265,71 @@
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🍳</span> Kookgroep</div>
-            <div class="ob-check-row" data-path="aanp" data-id="kookgroep">
-              <div class="ob-check-box"></div>
-              <span class="ob-check-label">Kookgroep toevoegen</span>
-              <span class="ob-check-sub">Voor inductiefornuis of elektrisch kooktoestel</span>
-              <span class="ob-check-price" data-price-ref="aanp.kookgroep"></span>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-path="aanp" data-id="kookgroep">
+              <span class="ob-toggle-icon">🍳</span>
+              <span class="ob-toggle-title">Kookgroep <em class="ob-toggle-price" data-price-ref="aanp.kookgroep"></em></span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🔋</span> Batterij aansluiting</div>
-            <div class="ob-btn-row" data-conn="batterij" data-path="aanp">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="aanp.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="aanp.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="batterij" data-path="aanp">
+              <span class="ob-toggle-icon">🔋</span>
+              <span class="ob-toggle-title">Batterij aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="aanp-batterij-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>🚗</span> Laadpaal aansluiting</div>
-            <div class="ob-btn-row" data-conn="laadpaal" data-path="aanp">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="aanp.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="aanp.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="laadpaal" data-path="aanp">
+              <span class="ob-toggle-icon">🚗</span>
+              <span class="ob-toggle-title">Laadpaal aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="aanp-laadpaal-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
-          <div class="ob-section">
-            <div class="ob-section-title"><span>☀️</span> Zonnepanelen aansluiting</div>
-            <div class="ob-btn-row" data-conn="zonnepanelen" data-path="aanp">
-              <button type="button" class="ob-opt-btn selected" data-val="geen">Geen</button>
-              <button type="button" class="ob-opt-btn" data-val="1fase">1-fase<span class="ob-opt-price" data-price-ref="aanp.conn_1fase"></span></button>
-              <button type="button" class="ob-opt-btn" data-val="3fase">3-fase<span class="ob-opt-price" data-price-ref="aanp.conn_3fase"></span></button>
+          <div class="ob-section ob-section-toggle">
+            <div class="ob-toggle-row" data-conn="zonnepanelen" data-path="aanp">
+              <span class="ob-toggle-icon">☀️</span>
+              <span class="ob-toggle-title">Zonnepanelen aansluiting</span>
+              <label class="ob-sw"><input type="checkbox" class="ob-sw-input"><span class="ob-sw-knob"></span></label>
+            </div>
+            <div class="ob-toggle-opts" id="aanp-zonnepanelen-opts">
+              <div class="ob-radio-row selected" data-val="1fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">1-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_1fase"></em>
+              </div>
+              <div class="ob-radio-row" data-val="3fase">
+                <div class="ob-radio-dot"></div>
+                <span class="ob-radio-label">3-fase</span>
+                <em class="ob-radio-price" data-price-ref="aanp.conn_3fase"></em>
+              </div>
             </div>
           </div>
 
@@ -286,12 +338,12 @@
             <div class="ob-check-row" data-path="aanp" data-id="beltrafo">
               <div class="ob-check-box"></div>
               <span class="ob-check-label">Beltrafo</span>
-              <span class="ob-check-price" data-price-ref="aanp.beltrafo"></span>
+              <em class="ob-check-price" data-price-ref="aanp.beltrafo"></em>
             </div>
             <div class="ob-check-row" data-path="aanp" data-id="overspanning">
               <div class="ob-check-box"></div>
               <span class="ob-check-label">Overspanningsbeveiliging</span>
-              <span class="ob-check-price" data-price-ref="aanp.overspanning"></span>
+              <em class="ob-check-price" data-price-ref="aanp.overspanning"></em>
             </div>
             <div class="ob-check-row ob-check-row-qty" data-path="aanp" data-id="stopcontact">
               <div class="ob-check-box"></div>
@@ -301,7 +353,7 @@
                 <span class="ob-qty-val" id="aanp-stopcontact-val">1</span>
                 <button type="button" class="ob-qty-btn" data-dir="1" data-target="aanp-stopcontact">+</button>
               </div>
-              <span class="ob-check-price" id="aanp-stopcontact-price" data-price-ref="aanp.stopcontact_per_stuk"></span>
+              <em class="ob-check-price" id="aanp-stopcontact-price" data-price-ref="aanp.stopcontact_per_stuk"></em>
             </div>
           </div>
 
@@ -318,7 +370,11 @@
               <span id="ob-surcharge-val"></span>
             </div>
             <div class="ob-grand-row">
-              <span>Totaal excl. BTW</span>
+              <span>Totaal incl. BTW (21%)</span>
+              <span id="ob-total-incl-val"></span>
+            </div>
+            <div class="ob-excl-row">
+              <span>Excl. BTW</span>
               <span id="ob-total-val"></span>
             </div>
           </div>
